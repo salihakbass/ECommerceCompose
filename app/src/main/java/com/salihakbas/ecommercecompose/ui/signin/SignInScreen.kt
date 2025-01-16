@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +46,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salihakbas.ecommercecompose.R
+import com.salihakbas.ecommercecompose.ui.components.AnnotatedLoginAndRegisterString
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
+import com.salihakbas.ecommercecompose.ui.components.GoogleButton
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
 import com.salihakbas.ecommercecompose.ui.signin.SignInContract.UiAction
 import com.salihakbas.ecommercecompose.ui.signin.SignInContract.UiEffect
@@ -81,7 +84,7 @@ fun SignInContent() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Welcome back! Please enter your details.",
+            text = stringResource(R.string.welcome_back_detail_text),
             fontSize = 18.sp,
             color = Color.Gray
         )
@@ -90,7 +93,7 @@ fun SignInContent() {
             onValueChange = {},
             label = {
                 Text(
-                    "Email",
+                    stringResource(R.string.email_text),
                     color = Color.Gray
                 )
             },
@@ -105,7 +108,7 @@ fun SignInContent() {
             onValueChange = {},
             label = {
                 Text(
-                    "Password",
+                    stringResource(R.string.password_text),
                     color = Color.Gray
                 )
             },
@@ -122,13 +125,13 @@ fun SignInContent() {
                 onCheckedChange = {}
             )
             Text(
-                text = "Remember me",
+                text = stringResource(R.string.remember_me_text),
                 modifier = Modifier.align(Alignment.CenterVertically),
                 color = Color.Black
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "Forgot Password?",
+                text = stringResource(R.string.forgot_password_text),
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(end = 12.dp),
@@ -148,7 +151,7 @@ fun SignInContent() {
             )
         ) {
             Text(
-                text = "Sign In",
+                text = stringResource(R.string.sign_in_text),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -159,102 +162,25 @@ fun SignInContent() {
             color = Color.Gray
         )
         GoogleButton(
-            text = "Sign Up with Google",
-            loadingText = "Creating Account...",
+            text = stringResource(R.string.sign_up_with_google_text),
+            loadingText = stringResource(R.string.creating_account_text),
             onClicked = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.Gray,
-                    )
-                ) {
-                    append("Don't have an account? ")
-                }
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append("Register")
-                }
-            }
+
+        AnnotatedLoginAndRegisterString(
+            accountText = stringResource(R.string.dont_have_an_account_text),
+            loginOrRegisterText = stringResource(R.string.sign_up_text)
         )
 
 
     }
 }
 
-@Composable
-fun GoogleButton(
-    modifier: Modifier,
-    text: String = "Sign Up with Google",
-    loadingText: String = "Creating Account...",
-    icon: Int = R.drawable.ic_google,
-    shape: Shape = MaterialTheme.shapes.medium,
-    borderColor: Color = Color.LightGray,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    progressIndicatorColor: Color = MaterialTheme.colorScheme.primary,
-    onClicked: () -> Unit
-) {
-    var clicked by remember { mutableStateOf(false) }
-    Surface(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
-            .clickable {
-                clicked = !clicked
-                onClicked()
-            },
-        shape = shape,
-        border = BorderStroke(width = 1.dp, color = borderColor),
-        color = backgroundColor
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(
-                    start = 12.dp,
-                    end = 16.dp,
-                    top = 12.dp,
-                    bottom = 12.dp
-                )
-                .animateContentSize(
-                    animationSpec = tween(
-                        durationMillis = 300,
-                        easing = LinearOutSlowInEasing
-                    )
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = "Google Button",
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = if (clicked) loadingText else text
-            )
 
-            if (clicked) {
-                Spacer(modifier = Modifier.width(16.dp))
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .height(16.dp)
-                        .width(16.dp),
-                    strokeWidth = 2.dp,
-                    color = progressIndicatorColor
-                )
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

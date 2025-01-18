@@ -9,6 +9,11 @@ object SignUpContract {
         val name: String = "",
         val surname: String = "",
         val errorState: ErrorState? = null,
+        val isCheckboxChecked: Boolean = false,
+        val isPasswordLongEnough: Boolean = false,
+        val hasNumber: Boolean = false,
+        val hasLetter: Boolean = false,
+        val isPasswordMatching: Boolean = false,
         val list: List<String> = emptyList(),
     ) {
         fun checkError(): UiState {
@@ -18,10 +23,14 @@ object SignUpContract {
                     passwordError = password.isEmpty(),
                     confirmPasswordError = confirmPassword.isEmpty(),
                     nameError = name.isEmpty(),
-                    surnameError = surname.isEmpty(),
-                    checkBoxError = false
+                    surnameError = surname.isEmpty()
+
                 )
             )
+        }
+        fun isSignUpValid(): Boolean {
+            return isPasswordLongEnough && hasNumber && hasLetter && isPasswordMatching &&
+                    email.isNotEmpty() && name.isNotEmpty() && surname.isNotEmpty() && isCheckboxChecked
         }
     }
 
@@ -31,8 +40,12 @@ object SignUpContract {
         val confirmPasswordError: Boolean = false,
         val nameError: Boolean = false,
         val surnameError: Boolean = false,
-        val checkBoxError: Boolean = false
-    )
+
+    ) {
+        fun hasError(): Boolean {
+            return emailError || passwordError || confirmPasswordError || nameError || surnameError
+        }
+    }
 
     sealed class UiAction {
         data class OnEmailChange(val email: String) : UiAction()
@@ -40,12 +53,12 @@ object SignUpContract {
         data class OnConfirmPasswordChange(val confirmPassword: String) : UiAction()
         data class OnNameChange(val name: String) : UiAction()
         data class OnSurnameChange(val surname: String) : UiAction()
+        data class OnCheckboxToggle(val isCheckboxChecked: Boolean): UiAction()
         data object SignUpClick : UiAction()
-
     }
 
     sealed class UiEffect {
         data object NavigateToSignIn : UiEffect()
-        data object ShowToast : UiEffect()
+        data object ShowSignUpToast: UiEffect()
     }
 }

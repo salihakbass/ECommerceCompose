@@ -1,6 +1,9 @@
 package com.salihakbas.ecommercecompose.ui.signup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.domain.repository.FirebaseAuthRepository
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiAction
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiState
@@ -12,10 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor() : ViewModel() {
+class SignUpViewModel @Inject constructor(
+    private val authRepository: FirebaseAuthRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -24,6 +30,36 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
     fun onAction(uiAction: UiAction) {
+        when (uiAction) {
+            is UiAction.OnEmailChange -> updateUiState { copy(email = uiAction.email) }
+            is UiAction.OnPasswordChange -> updateUiState { copy(password = uiAction.password) }
+            is UiAction.OnNameChange -> updateUiState { copy(name = uiAction.name) }
+            is UiAction.OnSurnameChange -> updateUiState { copy(surname = uiAction.surname) }
+            is UiAction.OnConfirmPasswordChange -> updateUiState { copy(confirmPassword = uiAction.confirmPassword) }
+            is UiAction.SignUpClick -> signUp()
+        }
+    }
+
+    private fun signUp() = viewModelScope.launch {
+
+        updateUiState { checkError() }
+
+        when (val result = authRepository.createUserWithEmailAndPassword(
+            name = uiState.value.name,
+            surname = uiState.value.surname,
+            email = uiState.value.email,
+            password = uiState.value.password
+        )) {
+            is Resource.Success -> {
+                emitUiEffect(UiEffect.NavigateToSignIn)
+                emitUiEffect(UiEffect.ShowToast)
+            }
+
+            is Resource.Error -> {
+
+            }
+        }
+
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

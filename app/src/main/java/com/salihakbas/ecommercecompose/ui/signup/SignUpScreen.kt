@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.sp
 import com.salihakbas.ecommercecompose.R
 import com.salihakbas.ecommercecompose.common.collectWithLifecycle
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
-import com.salihakbas.ecommercecompose.ui.components.GoogleButton
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiAction
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiEffect
@@ -61,8 +60,13 @@ fun SignUpScreen(
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
             is UiEffect.NavigateToSignIn -> navigateToSignIn()
-            is UiEffect.ShowToast -> {
-                Toast.makeText(context, "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
+
+            is UiEffect.ShowSignUpToast -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.sign_up_toast_text),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }
@@ -70,12 +74,12 @@ fun SignUpScreen(
     when {
         uiState.isLoading -> LoadingBar()
         uiState.list.isNotEmpty() -> EmptyScreen()
-        else -> SignUpContent(uiState, onAction, uiEffect)
+        else -> SignUpContent(uiState, onAction)
     }
 }
 
 @Composable
-fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow<UiEffect>) {
+fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit) {
     var isVisible by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -125,7 +129,7 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
             shape = RoundedCornerShape(16.dp),
             isError = uiState.errorState?.surnameError == true,
 
-        )
+            )
         OutlinedTextField(
             value = uiState.email,
             onValueChange = { onAction(UiAction.OnEmailChange(it)) },
@@ -139,7 +143,7 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
                 .padding(start = 12.dp, end = 12.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            isError =uiState.errorState?.emailError == true
+            isError = uiState.errorState?.emailError == true
         )
         OutlinedTextField(
             value = uiState.password,
@@ -191,13 +195,23 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
             },
             isError = uiState.errorState?.confirmPasswordError == true
         )
+        PasswordRequirements(
+            isPasswordLongEnough = uiState.isPasswordLongEnough,
+            hasLetter = uiState.hasLetter,
+            hasPassword = uiState.hasNumber,
+            isPasswordMatching = uiState.isPasswordMatching
+        )
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Checkbox(
-                checked = false,
-                onCheckedChange = {}
+                checked = uiState.isCheckboxChecked,
+                onCheckedChange = { onAction(UiAction.OnCheckboxToggle(it)) }
+
+
             )
             Text(
                 text = stringResource(R.string.agree_terms_text),
@@ -223,19 +237,7 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
                 fontWeight = FontWeight.SemiBold
             )
         }
-        Text(
-            text = "or",
-            modifier = Modifier.padding(vertical = 12.dp),
-            color = Color.Gray
-        )
-        GoogleButton(
-            text = stringResource(R.string.sign_up_with_google_text),
-            loadingText = stringResource(R.string.creating_account_text),
-            onClicked = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
@@ -260,6 +262,49 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
 
 
     }
+}
+
+@Composable
+fun PasswordRequirements(
+    isPasswordLongEnough: Boolean,
+    hasLetter: Boolean,
+    hasPassword: Boolean,
+    isPasswordMatching: Boolean
+) {
+    Column(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        PasswordRequirement(
+            text = stringResource(R.string.password_must_six_text),
+            isMet = isPasswordLongEnough
+        )
+        PasswordRequirement(
+            text = stringResource(R.string.password_must_has_letter_text),
+            isMet = hasLetter
+        )
+        PasswordRequirement(
+            text = stringResource(R.string.password_must_has_number_text),
+            isMet = hasPassword
+        )
+        PasswordRequirement(
+            text = stringResource(R.string.password_must_match_text),
+            isMet = isPasswordMatching
+        )
+    }
+}
+
+@Composable
+fun PasswordRequirement(text: String, isMet: Boolean) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        color = if (isMet) Color.Green else Color.Red,
+        fontWeight = if (isMet) FontWeight.Bold else FontWeight.Normal,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
 }
 
 @Preview(showBackground = true)

@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.junit.ext)
     androidTestImplementation(libs.espresso.core)
@@ -100,7 +101,7 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
 
     // Firebase
-    implementation(platform(libs.firebase))
+    implementation(platform(libs.firebase.bom))
 }
 
 detekt {

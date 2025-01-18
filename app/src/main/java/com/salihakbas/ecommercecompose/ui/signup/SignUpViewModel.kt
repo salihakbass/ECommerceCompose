@@ -36,18 +36,20 @@ class SignUpViewModel @Inject constructor(
                 updateUiState { copy(password = uiAction.password) }
                 validatePassword(uiAction.password, uiState.value.confirmPassword)
             }
-
             is UiAction.OnConfirmPasswordChange -> {
                 updateUiState { copy(confirmPassword = uiAction.confirmPassword) }
                 validatePassword(uiAction.confirmPassword, uiState.value.password)
             }
-
             is UiAction.OnNameChange -> updateUiState { copy(name = uiAction.name) }
             is UiAction.OnSurnameChange -> updateUiState { copy(surname = uiAction.surname) }
-
             is UiAction.SignUpClick -> signUp()
             is UiAction.OnCheckboxToggle -> updateUiState { copy(isCheckboxChecked = uiAction.isCheckboxChecked) }
+            is UiAction.SignInClicked -> navigateToSignIn()
         }
+    }
+
+    private fun navigateToSignIn() = viewModelScope.launch {
+        emitUiEffect(UiEffect.NavigateToSignIn)
     }
 
     private fun validatePassword(password: String, confirmPassword: String) {
@@ -91,7 +93,6 @@ class SignUpViewModel @Inject constructor(
 
             }
         }
-
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

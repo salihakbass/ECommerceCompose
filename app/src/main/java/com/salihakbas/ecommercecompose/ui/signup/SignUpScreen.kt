@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salihakbas.ecommercecompose.R
 import com.salihakbas.ecommercecompose.common.collectWithLifecycle
+import com.salihakbas.ecommercecompose.ui.components.AuthAnnotatedText
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiAction
@@ -60,7 +61,6 @@ fun SignUpScreen(
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
             is UiEffect.NavigateToSignIn -> navigateToSignIn()
-
             is UiEffect.ShowSignUpToast -> {
                 Toast.makeText(
                     context,
@@ -240,27 +240,11 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.Gray,
-                    )
-                ) {
-                    append(stringResource(R.string.already_have_an_account_text))
-                }
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(stringResource(R.string.sign_in_text))
-                }
-            }
+        AuthAnnotatedText(
+            normalText = stringResource(R.string.already_have_an_account_text),
+            clickableText = stringResource(R.string.sign_in_text),
+            onClickableTextClick = { onAction(UiAction.SignInClicked) }
         )
-
-
     }
 }
 

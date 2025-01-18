@@ -54,6 +54,7 @@ object SignUpContract {
         data class OnNameChange(val name: String) : UiAction()
         data class OnSurnameChange(val surname: String) : UiAction()
         data class OnCheckboxToggle(val isCheckboxChecked: Boolean): UiAction()
+        data object SignInClicked : UiAction()
         data object SignUpClick : UiAction()
     }
 

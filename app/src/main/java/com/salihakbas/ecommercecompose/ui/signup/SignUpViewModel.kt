@@ -32,17 +32,50 @@ class SignUpViewModel @Inject constructor(
     fun onAction(uiAction: UiAction) {
         when (uiAction) {
             is UiAction.OnEmailChange -> updateUiState { copy(email = uiAction.email) }
-            is UiAction.OnPasswordChange -> updateUiState { copy(password = uiAction.password) }
+            is UiAction.OnPasswordChange -> {
+                updateUiState { copy(password = uiAction.password) }
+                validatePassword(uiAction.password, uiState.value.confirmPassword)
+            }
+
+            is UiAction.OnConfirmPasswordChange -> {
+                updateUiState { copy(confirmPassword = uiAction.confirmPassword) }
+                validatePassword(uiAction.confirmPassword, uiState.value.password)
+            }
+
             is UiAction.OnNameChange -> updateUiState { copy(name = uiAction.name) }
             is UiAction.OnSurnameChange -> updateUiState { copy(surname = uiAction.surname) }
-            is UiAction.OnConfirmPasswordChange -> updateUiState { copy(confirmPassword = uiAction.confirmPassword) }
+
             is UiAction.SignUpClick -> signUp()
+            is UiAction.OnCheckboxToggle -> updateUiState { copy(isCheckboxChecked = uiAction.isCheckboxChecked) }
+        }
+    }
+
+    private fun validatePassword(password: String, confirmPassword: String) {
+        val containsLetter = password.any { it.isLetter() }
+        val containsDigit = password.any { it.isDigit() }
+        updateUiState {
+            copy(
+                isPasswordLongEnough = password.length >= 6,
+                hasLetter = containsLetter,
+                hasNumber = containsDigit,
+                isPasswordMatching = password == confirmPassword
+            )
         }
     }
 
     private fun signUp() = viewModelScope.launch {
-
+        val updatedState = uiState.value.checkError()
         updateUiState { checkError() }
+
+        if (uiState.value.errorState?.hasError() == true) {
+            emitUiEffect(UiEffect.ShowSignUpToast)
+            return@launch
+        }
+
+        if (!updatedState.isSignUpValid()) {
+            emitUiEffect(UiEffect.ShowSignUpToast)
+            return@launch
+        }
 
         when (val result = authRepository.createUserWithEmailAndPassword(
             name = uiState.value.name,
@@ -52,7 +85,6 @@ class SignUpViewModel @Inject constructor(
         )) {
             is Resource.Success -> {
                 emitUiEffect(UiEffect.NavigateToSignIn)
-                emitUiEffect(UiEffect.ShowToast)
             }
 
             is Resource.Error -> {

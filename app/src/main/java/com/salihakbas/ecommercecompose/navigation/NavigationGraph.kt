@@ -28,6 +28,7 @@ import com.salihakbas.ecommercecompose.ui.favorites.FavoritesScreen
 import com.salihakbas.ecommercecompose.ui.favorites.FavoritesViewModel
 import com.salihakbas.ecommercecompose.ui.profile.ProfileScreen
 import com.salihakbas.ecommercecompose.ui.profile.ProfileViewModel
+import com.salihakbas.ecommercecompose.ui.verifycode.VerifyCodeScreen
 
 @Composable
 fun NavigationGraph(
@@ -57,7 +58,10 @@ fun NavigationGraph(
             SignInScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateToSignUp = {navController.navigate(Screen.SignUp)},
+                navigateToHome = {navController.navigate(Screen.Home)},
+                navigateToForgotPassword = {navController.navigate(Screen.ForgotPassword)}
             )
         }
         composable<Screen.SignUp> {
@@ -67,7 +71,8 @@ fun NavigationGraph(
             SignUpScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateToSignIn = {navController.navigate(Screen.SignIn)}
             )
         }
         composable<Screen.ForgotPassword> {
@@ -77,7 +82,8 @@ fun NavigationGraph(
             ForgotPasswordScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateToSignIn = {navController.navigate(Screen.SignIn)}
             )
         }
         composable<Screen.ChangePassword> {
@@ -135,6 +141,16 @@ fun NavigationGraph(
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect
             ProfileScreen(
+                uiState = uiState,
+                uiEffect = uiEffect,
+                onAction = viewModel::onAction
+            )
+        }
+        composable<Screen.VerifyCode> {
+            val viewModel: VerifyCodeViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val uiEffect = viewModel.uiEffect
+            VerifyCodeScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction

@@ -15,4 +15,19 @@
     <string name="agree_terms_text">I agree to Terms and condition</string>
     <string name="sign_up_text">Sign Up</string>
     <string name="already_have_an_account_text">"Already have an account? "</string>
+    <string name="name_text">Name</string>
+    <string name="surname_text">Surname</string>
+    <string name="sign_up_toast_text">Lütfen tüm alanları doldurun veya şifre gereksinimlerini sağlayın.</string>
+    <string name="password_must_six_text">Şifre en az 6 karakter olmalıdır.</string>
+    <string name="password_must_has_letter_text">Şifre en az bir harf içermelidir.</string>
+    <string name="password_must_has_number_text">Şifre en az bir rakam içermelidir.</string>
+    <string name="password_must_match_text">Şifreler aynı olmalıdır.</string>
+    <string name="email_or_password_incorrect_text">E-mail veya şifre yanlış. Lütfen tekrar deneyin.</string>
+    <string name="password_changed_text">Şifre başarıyla değiştirildi</string>
+    <string name="password_error_text">Bir hata oluştu! Lütfen şifrelerinizi kontrol ediniz!</string>
+    <string name="create_new_password_text">Yeni Şifre Oluştur</string>
+    <string name="welcome_create_new_password_text">Tekrar hoşgeldiniz. Lütfen yeni şifrenizi giriniz.</string>
+    <string name="old_password_text">Eski şifre</string>
+    <string name="confirm_new_password_text">Yeni şifreyi doğrula</string>
+    <string name="create_password_button_text">Şifreyi Oluştur</string>
 </resources>

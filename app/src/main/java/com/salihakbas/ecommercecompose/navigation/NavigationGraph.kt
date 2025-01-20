@@ -28,7 +28,6 @@ import com.salihakbas.ecommercecompose.ui.favorites.FavoritesScreen
 import com.salihakbas.ecommercecompose.ui.favorites.FavoritesViewModel
 import com.salihakbas.ecommercecompose.ui.profile.ProfileScreen
 import com.salihakbas.ecommercecompose.ui.profile.ProfileViewModel
-import com.salihakbas.ecommercecompose.ui.verifycode.VerifyCodeScreen
 
 @Composable
 fun NavigationGraph(
@@ -146,16 +145,7 @@ fun NavigationGraph(
                 onAction = viewModel::onAction
             )
         }
-        composable<Screen.VerifyCode> {
-            val viewModel: VerifyCodeViewModel = hiltViewModel()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val uiEffect = viewModel.uiEffect
-            VerifyCodeScreen(
-                uiState = uiState,
-                uiEffect = uiEffect,
-                onAction = viewModel::onAction
-            )
-        }
+
 
     }
 }

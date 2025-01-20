@@ -16,4 +16,8 @@ interface FirebaseAuthRepository {
     ): Resource<String>
 
     suspend fun isUserLoggedIn(): Boolean
+
+    suspend fun sendPasswordResetEmail(
+        email: String
+    ): Resource<String>
 }

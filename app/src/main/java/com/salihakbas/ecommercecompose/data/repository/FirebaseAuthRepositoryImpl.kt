@@ -37,6 +37,15 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isUserLoggedIn(): Boolean = firebaseAuth.currentUser != null
+
+    override suspend fun sendPasswordResetEmail(email: String): Resource<String> {
+        return try {
+            firebaseAuth.sendPasswordResetEmail(email).await()
+            Resource.Success("Şifre sıfırlama bağlantısı gönderildi.")
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Error")
+        }
+    }
 }
 
 

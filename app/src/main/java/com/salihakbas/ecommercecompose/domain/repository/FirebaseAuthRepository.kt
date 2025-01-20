@@ -20,4 +20,14 @@ interface FirebaseAuthRepository {
     suspend fun sendPasswordResetEmail(
         email: String
     ): Resource<String>
+
+    suspend fun signOut() : Resource<String>
+
+    suspend fun changePassword(
+        email: String,
+        oldPassword: String,
+        newPassword: String
+    ): Resource<String>
+
+    suspend fun getCurrentUserEmail(): String?
 }

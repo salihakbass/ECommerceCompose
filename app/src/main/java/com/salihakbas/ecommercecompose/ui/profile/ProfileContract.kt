@@ -6,7 +6,13 @@ object ProfileContract {
         val list: List<String> = emptyList(),
     )
 
-    sealed class UiAction
+    sealed class UiAction {
+        data object SignOutClicked : UiAction()
+        data object ChangePasswordClicked : UiAction()
+    }
 
-    sealed class UiEffect
+    sealed class UiEffect {
+        data object NavigateToSignIn : UiEffect()
+        data object NavigateToChangePassword : UiEffect()
+    }
 }

@@ -102,6 +102,7 @@ dependencies {
 
     // Firebase
     implementation(platform(libs.firebase.bom))
+    implementation (libs.firebase.database.ktx)
 }
 
 detekt {

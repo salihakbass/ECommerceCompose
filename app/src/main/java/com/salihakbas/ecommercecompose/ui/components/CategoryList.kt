@@ -17,23 +17,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.salihakbas.ecommercecompose.data.source.remote.Category
 import com.salihakbas.ecommercecompose.ui.home.HomeContract
 
 @Composable
 fun CategoryList(
     uiState: HomeContract.UiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCategoryClick: (String?) -> Unit
 ) {
+    val categories = listOf(Category("Tümü")) + uiState.categoryList
     var selectedTabIndex by remember { mutableStateOf(0) }
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
+        edgePadding = 2.dp,
         modifier = modifier
     ) {
-        uiState.categoryList.forEachIndexed { index, category ->
+
+        categories.forEachIndexed { index, category ->
             Tab(
                 selected = index == selectedTabIndex,
                 onClick = {
                     selectedTabIndex = index
+                    onCategoryClick(category.name)
                 },
                 text = {
                     Text(
@@ -43,12 +49,12 @@ fun CategoryList(
                         color = if (index == selectedTabIndex) Color.White else Color.Gray,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .padding(vertical = 8.dp, horizontal = 4.dp)
                             .background(
                                 color = if (index == selectedTabIndex) Color.Black else Color.Transparent,
                                 shape = RoundedCornerShape(24.dp)
                             )
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .padding(horizontal = 18.dp, vertical = 8.dp)
                     )
                 }
             )

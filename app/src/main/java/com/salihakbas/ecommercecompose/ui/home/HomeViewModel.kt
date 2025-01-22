@@ -1,6 +1,5 @@
 package com.salihakbas.ecommercecompose.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.FirebaseDatabase
@@ -29,7 +28,6 @@ class HomeViewModel @Inject constructor(
     private val fetchCategoriesUseCase: FetchCategoriesUseCase
 ) : ViewModel() {
 
-
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
@@ -39,7 +37,6 @@ class HomeViewModel @Inject constructor(
     init {
         getCategories()
     }
-
 
     fun onAction(uiAction: UiAction) {
         when (uiAction) {
@@ -53,15 +50,20 @@ class HomeViewModel @Inject constructor(
             .onCompletion { updateUiState { copy(isLoading = false) } }
             .collect { result ->
                 when (result) {
-                    is Resource.Success -> {
-                        updateUiState { copy(categoryList = result.data) }
-                    }
-
-                    is Resource.Error -> {
-                        updateUiState { copy(errorMessage = result.message) }
-                    }
+                    is Resource.Success -> updateUiState { copy(categoryList = result.data) }
+                    is Resource.Error -> updateUiState { copy(errorMessage = result.message) }
                 }
             }
+    }
+
+    fun filterProductsByCategory(categoryName: String?) {
+        val allProducts = uiState.value.allProducts
+        val filteredProducts = if (categoryName == null || categoryName == "Tümü") {
+            allProducts
+        } else {
+            allProducts.filter {it.category.equals(categoryName, ignoreCase = true)}
+        }
+        updateUiState { copy(productList = filteredProducts) }
     }
 
 
@@ -69,12 +71,10 @@ class HomeViewModel @Inject constructor(
         updateUiState { copy(isLoading = true) }
         when (val result = fetchProductsUseCase()) {
             is Resource.Success -> {
-                updateUiState { copy(isLoading = false, productList = result.data) }
+                updateUiState { copy(isLoading = false, productList = result.data, allProducts = result.data) }
             }
-
             is Resource.Error -> {
                 updateUiState { copy(isLoading = false) }
-                Log.e("HomeViewModel", "Hata: ${result.message}")
             }
         }
     }
@@ -97,12 +97,10 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    Log.d("RealtimeDatabase", "Kullanıcı bulunamadı")
                     updateUiState { copy(isLoading = false) }
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("RealtimeDatabase", "Hata oluştu: ${e.message}")
                 updateUiState { copy(isLoading = false) }
             }
     }

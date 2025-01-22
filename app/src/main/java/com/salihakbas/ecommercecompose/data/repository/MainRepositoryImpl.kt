@@ -1,7 +1,6 @@
 package com.salihakbas.ecommercecompose.data.repository
 
 import android.util.Log
-import com.salihakbas.ecommercecompose.common.Resource
 import com.salihakbas.ecommercecompose.data.source.local.MainDao
 import com.salihakbas.ecommercecompose.data.source.remote.MainService
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.CategoryResponse

@@ -1,6 +1,12 @@
 package com.salihakbas.ecommercecompose.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.database.FirebaseDatabase
+import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.domain.usecase.FetchCategoriesUseCase
+import com.salihakbas.ecommercecompose.domain.usecase.FetchProductsUseCase
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiAction
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiState
@@ -10,12 +16,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val fetchProductsUseCase: FetchProductsUseCase,
+    private val fetchCategoriesUseCase: FetchCategoriesUseCase
+) : ViewModel() {
+
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -23,8 +36,77 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val _uiEffect by lazy { Channel<UiEffect>() }
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
-    fun onAction(uiAction: UiAction) {
+    init {
+        getCategories()
     }
+
+
+    fun onAction(uiAction: UiAction) {
+        when (uiAction) {
+            is UiAction.FetchProducts -> fetchProducts()
+        }
+    }
+
+    private fun getCategories() = viewModelScope.launch {
+        fetchCategoriesUseCase.invoke()
+            .onStart { updateUiState { copy(isLoading = true) } }
+            .onCompletion { updateUiState { copy(isLoading = false) } }
+            .collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        updateUiState { copy(categoryList = result.data) }
+                    }
+
+                    is Resource.Error -> {
+                        updateUiState { copy(errorMessage = result.message) }
+                    }
+                }
+            }
+    }
+
+
+    private fun fetchProducts() = viewModelScope.launch {
+        updateUiState { copy(isLoading = true) }
+        when (val result = fetchProductsUseCase()) {
+            is Resource.Success -> {
+                updateUiState { copy(isLoading = false, productList = result.data) }
+            }
+
+            is Resource.Error -> {
+                updateUiState { copy(isLoading = false) }
+                Log.e("HomeViewModel", "Hata: ${result.message}")
+            }
+        }
+    }
+
+    fun fetchUserFromRealtimeDatabase(userId: String) {
+        updateUiState { copy(isLoading = true) }
+
+        val database = FirebaseDatabase.getInstance().reference
+        database.child("users").child(userId).get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val name = snapshot.child("name").getValue(String::class.java) ?: ""
+                    val surname = snapshot.child("surname").getValue(String::class.java) ?: ""
+
+                    updateUiState {
+                        copy(
+                            isLoading = false,
+                            userName = name,
+                            userSurname = surname
+                        )
+                    }
+                } else {
+                    Log.d("RealtimeDatabase", "Kullanıcı bulunamadı")
+                    updateUiState { copy(isLoading = false) }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("RealtimeDatabase", "Hata oluştu: ${e.message}")
+                updateUiState { copy(isLoading = false) }
+            }
+    }
+
 
     private fun updateUiState(block: UiState.() -> UiState) {
         _uiState.update(block)

@@ -1,7 +1,9 @@
 package com.salihakbas.ecommercecompose.ui.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.database.FirebaseDatabase
 import com.salihakbas.ecommercecompose.common.Resource
 import com.salihakbas.ecommercecompose.domain.repository.FirebaseAuthRepository
 import com.salihakbas.ecommercecompose.ui.signup.SignUpContract.UiAction
@@ -86,6 +88,7 @@ class SignUpViewModel @Inject constructor(
             password = uiState.value.password
         )) {
             is Resource.Success -> {
+                saveUserToRealtimeDatabase(result.data, uiState.value.name, uiState.value.surname)
                 emitUiEffect(UiEffect.NavigateToSignIn)
             }
 
@@ -93,6 +96,22 @@ class SignUpViewModel @Inject constructor(
 
             }
         }
+    }
+
+    private fun saveUserToRealtimeDatabase(userId: String, name: String, surname: String) {
+        val database = FirebaseDatabase.getInstance().reference
+        val userMap = mapOf(
+            "name" to name,
+            "surname" to surname
+        )
+
+        database.child("users").child(userId).setValue(userMap)
+            .addOnSuccessListener {
+                Log.d("RealtimeDatabase", "Kullanıcı başarıyla kaydedildi.")
+            }
+            .addOnFailureListener { e ->
+                Log.e("RealtimeDatabase", "Hata oluştu: ${e.message}")
+            }
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

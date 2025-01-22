@@ -37,13 +37,15 @@ fun HomeScreen(
     uiState: UiState,
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
-    userId: String
+    userId: String,
+    onCategoryClick: (String?) -> Unit
 ) {
     when {
         uiState.isLoading -> LoadingBar()
         uiState.list.isNotEmpty() -> EmptyScreen()
         else -> HomeContent(
-            uiState = uiState
+            uiState = uiState,
+            onCategoryClick = onCategoryClick
 
         )
     }
@@ -55,17 +57,19 @@ fun HomeScreen(
 
 @Composable
 fun HomeContent(
-    uiState: UiState
+    uiState: UiState,
+    onCategoryClick: (String?) -> Unit
 ) {
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         CategoryList(
-            uiState = uiState
+            uiState = uiState,
+            onCategoryClick = onCategoryClick
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         if (uiState.productList.isNotEmpty()) {
@@ -82,21 +86,6 @@ fun HomeContent(
         }
     }
 }
-
-
-@Composable
-fun ProductList(products: List<Product>) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(products) { product ->
-            ProductCard(product)
-        }
-    }
-}
-
 
 @Composable
 fun ProductCard(product: Product) {
@@ -124,6 +113,7 @@ fun HomeScreenPreview(
         uiState = uiState,
         uiEffect = emptyFlow(),
         onAction = {},
-        userId = "userId"
+        userId = "userId",
+        onCategoryClick = {}
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -26,6 +28,7 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.ui.components.CategoryList
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
+import com.salihakbas.ecommercecompose.ui.components.SearchView
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiAction
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiState
@@ -45,20 +48,18 @@ fun HomeScreen(
         uiState.list.isNotEmpty() -> EmptyScreen()
         else -> HomeContent(
             uiState = uiState,
-            onCategoryClick = onCategoryClick
+            onCategoryClick = onCategoryClick,
+            onAction = onAction
 
         )
-    }
-
-    LaunchedEffect(Unit) {
-        onAction(UiAction.FetchProducts)
     }
 }
 
 @Composable
 fun HomeContent(
     uiState: UiState,
-    onCategoryClick: (String?) -> Unit
+    onCategoryClick: (String?) -> Unit,
+    onAction: (UiAction) -> Unit
 ) {
 
     Column(
@@ -66,6 +67,14 @@ fun HomeContent(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        SearchView(
+            query = uiState.query,
+            onQueryChange = { onAction(UiAction.OnQueryChanged(it)) },
+            onSearchQuery = {query ->
+                onAction(UiAction.SearchProducts(query))
+            }
+        )
+
         CategoryList(
             uiState = uiState,
             onCategoryClick = onCategoryClick

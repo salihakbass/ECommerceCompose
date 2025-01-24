@@ -10,12 +10,12 @@ object HomeContract {
         val userName: String = "",
         val userSurname: String = "",
         val productList: List<Product> = emptyList(),
+        val allProducts: List<Product> = emptyList(),
         val categoryList:List<Category> = emptyList(),
         val errorMessage: String? = null
     )
 
     sealed class UiAction {
-
         data object FetchProducts : UiAction()
     }
 

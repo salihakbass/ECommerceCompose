@@ -6,6 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.salihakbas.ecommercecompose.common.Resource
 import com.salihakbas.ecommercecompose.domain.usecase.FetchCategoriesUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.FetchProductsUseCase
+import com.salihakbas.ecommercecompose.domain.usecase.SearchProductsUseCase
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiAction
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiState
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val fetchProductsUseCase: FetchProductsUseCase,
-    private val fetchCategoriesUseCase: FetchCategoriesUseCase
+    private val fetchCategoriesUseCase: FetchCategoriesUseCase,
+    private val searchProductsUseCase: SearchProductsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -36,11 +38,32 @@ class HomeViewModel @Inject constructor(
 
     init {
         getCategories()
+        fetchProducts()
     }
 
     fun onAction(uiAction: UiAction) {
         when (uiAction) {
-            is UiAction.FetchProducts -> fetchProducts()
+            is UiAction.SearchProducts -> searchProducts(uiAction.query)
+            is UiAction.OnQueryChanged -> updateUiState { copy(query = uiAction.query) }
+        }
+    }
+
+    private fun searchProducts(query: String) = viewModelScope.launch {
+
+        updateUiState { copy(isLoading = true) }
+        when (val result = searchProductsUseCase(query)) {
+            is Resource.Success -> updateUiState {
+                copy(
+                    isLoading = false,
+                    productList = result.data
+                )
+            }
+            is Resource.Error -> updateUiState {
+                copy(
+                    isLoading = false,
+                    errorMessage = result.message
+                )
+            }
         }
     }
 
@@ -61,17 +84,22 @@ class HomeViewModel @Inject constructor(
         val filteredProducts = if (categoryName == null || categoryName == "Tümü") {
             allProducts
         } else {
-            allProducts.filter {it.category.equals(categoryName, ignoreCase = true)}
+            allProducts.filter { it.category.equals(categoryName, ignoreCase = true) }
         }
         updateUiState { copy(productList = filteredProducts) }
     }
-
 
     private fun fetchProducts() = viewModelScope.launch {
         updateUiState { copy(isLoading = true) }
         when (val result = fetchProductsUseCase()) {
             is Resource.Success -> {
-                updateUiState { copy(isLoading = false, productList = result.data, allProducts = result.data) }
+                updateUiState {
+                    copy(
+                        isLoading = false,
+                        productList = result.data,
+                        allProducts = result.data
+                    )
+                }
             }
             is Resource.Error -> {
                 updateUiState { copy(isLoading = false) }

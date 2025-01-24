@@ -11,12 +11,14 @@ object HomeContract {
         val userSurname: String = "",
         val productList: List<Product> = emptyList(),
         val allProducts: List<Product> = emptyList(),
-        val categoryList:List<Category> = emptyList(),
-        val errorMessage: String? = null
+        val categoryList: List<Category> = emptyList(),
+        val errorMessage: String? = null,
+        val query: String = "",
     )
 
     sealed class UiAction {
-        data object FetchProducts : UiAction()
+        data class SearchProducts(val query: String) : UiAction()
+        data class OnQueryChanged(val query: String) : UiAction()
     }
 
     sealed class UiEffect

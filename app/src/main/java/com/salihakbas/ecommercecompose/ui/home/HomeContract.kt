@@ -17,7 +17,6 @@ object HomeContract {
     )
 
     sealed class UiAction {
-        data class SearchProducts(val query: String) : UiAction()
         data class OnQueryChanged(val query: String) : UiAction()
     }
 

@@ -32,4 +32,18 @@ sealed interface Screen {
 
     @Serializable
     data object Profile : Screen
+
+    @Serializable
+    data object Search : Screen
+
+    companion object {
+        fun getRoute(screen: Screen): String = screen::class.qualifiedName.orEmpty()
+
+        fun showBottomBar(currentRoute: String?): Boolean {
+            return when (currentRoute) {
+                getRoute(Home), getRoute(Profile), getRoute(Favorites), getRoute(Cart) -> true
+                else -> false
+            }
+        }
+    }
 }

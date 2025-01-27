@@ -1,6 +1,7 @@
 package com.salihakbas.ecommercecompose.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -8,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.firebase.auth.FirebaseAuth
 import com.salihakbas.ecommercecompose.ui.splash.SplashScreen
 import com.salihakbas.ecommercecompose.ui.splash.SplashViewModel
 import com.salihakbas.ecommercecompose.ui.signin.SignInScreen
@@ -28,6 +30,8 @@ import com.salihakbas.ecommercecompose.ui.favorites.FavoritesScreen
 import com.salihakbas.ecommercecompose.ui.favorites.FavoritesViewModel
 import com.salihakbas.ecommercecompose.ui.profile.ProfileScreen
 import com.salihakbas.ecommercecompose.ui.profile.ProfileViewModel
+import com.salihakbas.ecommercecompose.ui.search.SearchScreen
+import com.salihakbas.ecommercecompose.ui.search.SearchViewModel
 
 @Composable
 fun NavigationGraph(
@@ -92,18 +96,27 @@ fun NavigationGraph(
             ChangePasswordScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateToProfile = {navController.navigate(Screen.Profile)}
             )
         }
         composable<Screen.Home> {
             val viewModel: HomeViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             HomeScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                userId = userId,
+                onCategoryClick = {viewModel.filterProductsByCategory(it)},
+                navigateToSearch = {navController.navigate(Screen.Search)},
             )
+            LaunchedEffect(key1 = userId) {
+                viewModel.fetchUserFromRealtimeDatabase(userId)
+            }
+
         }
         composable<Screen.Detail> {
             val viewModel: DetailViewModel = hiltViewModel()
@@ -142,9 +155,23 @@ fun NavigationGraph(
             ProfileScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
+                onAction = viewModel::onAction,
+                navigateToSignIn = {navController.navigate(Screen.SignIn)},
+                navigateToChangePassword = {navController.navigate(Screen.ChangePassword)}
+            )
+        }
+
+        composable<Screen.Search> {
+            val viewModel: SearchViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val uiEffect = viewModel.uiEffect
+            SearchScreen(
+                uiState = uiState,
+                uiEffect = uiEffect,
                 onAction = viewModel::onAction
             )
         }
+
 
 
     }

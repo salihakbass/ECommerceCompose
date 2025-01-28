@@ -42,34 +42,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onAction(uiAction: UiAction) {
-        when (uiAction) {
-            is UiAction.OnQueryChanged -> {
-                updateUiState { copy(query = uiAction.query) }
-                if (uiAction.query.isNotEmpty()) {
-                    searchProducts(query = uiAction.query)
-                } else {
-                    updateUiState { copy(productList = allProducts) }
-                }
-            }
-        }
-    }
-
-    private fun searchProducts(query: String) = viewModelScope.launch {
-        when (val result = searchProductsUseCase(query)) {
-            is Resource.Success -> updateUiState {
-                copy(
-                    isLoading = false,
-                    productList = result.data
-                )
-            }
-
-            is Resource.Error -> updateUiState {
-                copy(
-                    isLoading = false,
-                    errorMessage = result.message
-                )
-            }
-        }
     }
 
     private fun getCategories() = viewModelScope.launch {
@@ -106,7 +78,6 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-
             is Resource.Error -> {
                 updateUiState { copy(isLoading = false) }
             }

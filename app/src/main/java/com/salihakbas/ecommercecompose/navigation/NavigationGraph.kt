@@ -10,28 +10,30 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.firebase.auth.FirebaseAuth
-import com.salihakbas.ecommercecompose.ui.splash.SplashScreen
-import com.salihakbas.ecommercecompose.ui.splash.SplashViewModel
-import com.salihakbas.ecommercecompose.ui.signin.SignInScreen
-import com.salihakbas.ecommercecompose.ui.signin.SignInViewModel
-import com.salihakbas.ecommercecompose.ui.signup.SignUpScreen
-import com.salihakbas.ecommercecompose.ui.signup.SignUpViewModel
-import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordScreen
-import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordViewModel
-import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordScreen
-import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordViewModel
-import com.salihakbas.ecommercecompose.ui.home.HomeScreen
-import com.salihakbas.ecommercecompose.ui.home.HomeViewModel
-import com.salihakbas.ecommercecompose.ui.detail.DetailScreen
-import com.salihakbas.ecommercecompose.ui.detail.DetailViewModel
 import com.salihakbas.ecommercecompose.ui.cart.CartScreen
 import com.salihakbas.ecommercecompose.ui.cart.CartViewModel
+import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordScreen
+import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordViewModel
+import com.salihakbas.ecommercecompose.ui.detail.DetailScreen
+import com.salihakbas.ecommercecompose.ui.detail.DetailViewModel
+import com.salihakbas.ecommercecompose.ui.discount.DiscountScreen
+import com.salihakbas.ecommercecompose.ui.discount.DiscountViewModel
 import com.salihakbas.ecommercecompose.ui.favorites.FavoritesScreen
 import com.salihakbas.ecommercecompose.ui.favorites.FavoritesViewModel
+import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordScreen
+import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordViewModel
+import com.salihakbas.ecommercecompose.ui.home.HomeScreen
+import com.salihakbas.ecommercecompose.ui.home.HomeViewModel
 import com.salihakbas.ecommercecompose.ui.profile.ProfileScreen
 import com.salihakbas.ecommercecompose.ui.profile.ProfileViewModel
 import com.salihakbas.ecommercecompose.ui.search.SearchScreen
 import com.salihakbas.ecommercecompose.ui.search.SearchViewModel
+import com.salihakbas.ecommercecompose.ui.signin.SignInScreen
+import com.salihakbas.ecommercecompose.ui.signin.SignInViewModel
+import com.salihakbas.ecommercecompose.ui.signup.SignUpScreen
+import com.salihakbas.ecommercecompose.ui.signup.SignUpViewModel
+import com.salihakbas.ecommercecompose.ui.splash.SplashScreen
+import com.salihakbas.ecommercecompose.ui.splash.SplashViewModel
 
 @Composable
 fun NavigationGraph(
@@ -62,9 +64,9 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateToSignUp = {navController.navigate(Screen.SignUp)},
-                navigateToHome = {navController.navigate(Screen.Home)},
-                navigateToForgotPassword = {navController.navigate(Screen.ForgotPassword)}
+                navigateToSignUp = { navController.navigate(Screen.SignUp) },
+                navigateToHome = { navController.navigate(Screen.Home) },
+                navigateToForgotPassword = { navController.navigate(Screen.ForgotPassword) }
             )
         }
         composable<Screen.SignUp> {
@@ -75,7 +77,7 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateToSignIn = {navController.navigate(Screen.SignIn)}
+                navigateToSignIn = { navController.navigate(Screen.SignIn) }
             )
         }
         composable<Screen.ForgotPassword> {
@@ -86,7 +88,7 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateToSignIn = {navController.navigate(Screen.SignIn)}
+                navigateToSignIn = { navController.navigate(Screen.SignIn) }
             )
         }
         composable<Screen.ChangePassword> {
@@ -97,7 +99,7 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateToProfile = {navController.navigate(Screen.Profile)}
+                navigateToProfile = { navController.navigate(Screen.Profile) }
             )
         }
         composable<Screen.Home> {
@@ -110,8 +112,9 @@ fun NavigationGraph(
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
                 userId = userId,
-                onCategoryClick = {viewModel.filterProductsByCategory(it)},
-                navigateToSearch = {navController.navigate(Screen.Search)},
+                onCategoryClick = { viewModel.filterProductsByCategory(it) },
+                navigateToSearch = { navController.navigate(Screen.Search) },
+                navigateToDiscount = { navController.navigate(Screen.Discount) }
             )
             LaunchedEffect(key1 = userId) {
                 viewModel.fetchUserFromRealtimeDatabase(userId)
@@ -156,8 +159,8 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateToSignIn = {navController.navigate(Screen.SignIn)},
-                navigateToChangePassword = {navController.navigate(Screen.ChangePassword)}
+                navigateToSignIn = { navController.navigate(Screen.SignIn) },
+                navigateToChangePassword = { navController.navigate(Screen.ChangePassword) }
             )
         }
 
@@ -172,6 +175,16 @@ fun NavigationGraph(
             )
         }
 
+        composable<Screen.Discount> {
+            val viewModel: DiscountViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val uiEffect = viewModel.uiEffect
+            DiscountScreen(
+                uiState = uiState,
+                uiEffect = uiEffect,
+                onAction = viewModel::onAction
+            )
+        }
 
 
     }

@@ -1,25 +1,37 @@
 package com.salihakbas.ecommercecompose.ui.discount
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.salihakbas.ecommercecompose.ui.cart.CartScreenPreviewProvider
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.salihakbas.ecommercecompose.R
+import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
 import com.salihakbas.ecommercecompose.ui.discount.DiscountContract.UiAction
 import com.salihakbas.ecommercecompose.ui.discount.DiscountContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.discount.DiscountContract.UiState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun DiscountScreen(
@@ -30,29 +42,112 @@ fun DiscountScreen(
     when {
         uiState.isLoading -> LoadingBar()
         uiState.list.isNotEmpty() -> EmptyScreen()
-        else -> DiscountContent()
+        else -> DiscountContent(
+            uiState = uiState
+        )
     }
 }
 
 @Composable
-fun DiscountContent() {
+fun DiscountContent(
+    uiState: UiState
+) {
     Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "İndirimli Ürünler \uD83C\uDF89 \uD83C\uDF89 ",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(16.dp)
+        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+
+            items(uiState.discountList) { product ->
+                ProductItem(product)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun ProductItem(product: Product) {
+    val discountPercentage = if (product.salePrice != null) {
+        ((product.price - product.salePrice) / product.price * 100).toInt()
+    } else {
+        0
+    }
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(vertical = 8.dp)
     ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current).data(product.imageOne)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(8.dp),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+                Column {
+                    Text(
+                        text = product.title,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        maxLines = 1,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "₺ ${product.salePrice}",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.ic_discount),
+                            contentDescription = "Discount",
+                            tint = Color.Red
+                        )
+                        Text(
+                            text = "%${discountPercentage} İndirim",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Red
+                        )
+                    }
+                    Text(
+                        text = "₺ ${product.price}",
+                        fontSize = 18.sp,
+                        color = Color.Gray,
+                        textDecoration = TextDecoration.LineThrough
 
+
+                    )
+
+                }
+
+            }
+
+        }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DiscountScreenPreview(
-    @PreviewParameter(CartScreenPreviewProvider::class) uiState: UiState,
-) {
-    DiscountScreen(
-        uiState = uiState,
-        uiEffect = emptyFlow(),
-        onAction = {},
-    )
 }

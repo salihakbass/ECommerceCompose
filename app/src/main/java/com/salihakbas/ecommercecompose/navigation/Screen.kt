@@ -36,6 +36,9 @@ sealed interface Screen {
     @Serializable
     data object Search : Screen
 
+    @Serializable
+    data object Discount : Screen
+
     companion object {
         fun getRoute(screen: Screen): String = screen::class.qualifiedName.orEmpty()
 

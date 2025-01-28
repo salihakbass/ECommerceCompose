@@ -18,11 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -37,6 +43,7 @@ import com.salihakbas.ecommercecompose.ui.components.SuggestedProductsPager
 import com.salihakbas.ecommercecompose.ui.search.SearchContract.UiAction
 import com.salihakbas.ecommercecompose.ui.search.SearchContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.search.SearchContract.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -46,12 +53,23 @@ fun SearchScreen(
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(Unit) {
+        delay(100)
+        focusRequester.requestFocus()
+        keyboardController?.let {
+            delay(100)
+            it.show()
+        }
+    }
     when {
         uiState.isLoading -> LoadingBar()
         uiState.list.isNotEmpty() -> EmptyScreen()
         else -> SearchContent(
             uiState = uiState,
-            onAction = onAction
+            onAction = onAction,
+            focusRequester = focusRequester
         )
     }
 }
@@ -59,7 +77,8 @@ fun SearchScreen(
 @Composable
 fun SearchContent(
     uiState: UiState,
-    onAction: (UiAction) -> Unit
+    onAction: (UiAction) -> Unit,
+    focusRequester: FocusRequester
 ) {
     val popularItems = listOf("Msi", "Asus", "Lenovo", "SteelSeries", "Razer")
     Column(
@@ -72,7 +91,7 @@ fun SearchContent(
         SearchTextField(
             query = uiState.query,
             onQueryChange = { onAction(UiAction.OnQueryChanged(it)) },
-            navigateToSearch = {}
+            focusRequester = focusRequester
         )
         Spacer(modifier = Modifier.height(16.dp))
 

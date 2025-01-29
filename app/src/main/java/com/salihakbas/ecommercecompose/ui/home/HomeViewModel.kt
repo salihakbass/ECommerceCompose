@@ -6,7 +6,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.salihakbas.ecommercecompose.common.Resource
 import com.salihakbas.ecommercecompose.domain.usecase.FetchCategoriesUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.FetchProductsUseCase
-import com.salihakbas.ecommercecompose.domain.usecase.SearchProductsUseCase
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiAction
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiState
@@ -77,6 +76,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
+
             is Resource.Error -> {
                 updateUiState { copy(isLoading = false) }
             }

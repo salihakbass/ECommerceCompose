@@ -114,7 +114,8 @@ fun NavigationGraph(
                 userId = userId,
                 onCategoryClick = { viewModel.filterProductsByCategory(it) },
                 navigateToSearch = { navController.navigate(Screen.Search) },
-                navigateToDiscount = { navController.navigate(Screen.Discount) }
+                navigateToDiscount = { navController.navigate(Screen.Discount) },
+                navigateToProducts = { }
             )
             LaunchedEffect(key1 = userId) {
                 viewModel.fetchUserFromRealtimeDatabase(userId)
@@ -171,7 +172,8 @@ fun NavigationGraph(
             SearchScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateBack = { navController.popBackStack() }
             )
         }
 
@@ -182,7 +184,8 @@ fun NavigationGraph(
             DiscountScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateBack = { navController.popBackStack() }
             )
         }
 

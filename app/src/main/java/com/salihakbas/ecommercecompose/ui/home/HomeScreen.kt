@@ -4,17 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -31,28 +28,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.salihakbas.ecommercecompose.R
 import com.salihakbas.ecommercecompose.common.collectWithLifecycle
-import com.salihakbas.ecommercecompose.domain.model.Product
-import com.salihakbas.ecommercecompose.ui.components.CategoryList
+import com.salihakbas.ecommercecompose.ui.components.CategoryCard
+import com.salihakbas.ecommercecompose.ui.components.DiscountedCard
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
-import com.salihakbas.ecommercecompose.ui.components.ProductCard
+import com.salihakbas.ecommercecompose.ui.components.PopularProductRow
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiAction
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.home.HomeContract.UiState
@@ -67,12 +58,14 @@ fun HomeScreen(
     userId: String,
     onCategoryClick: (String?) -> Unit,
     navigateToSearch: () -> Unit,
-    navigateToDiscount: () -> Unit
+    navigateToDiscount: () -> Unit,
+    navigateToProducts: () -> Unit
 ) {
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
             is UiEffect.NavigateToSearch -> navigateToSearch()
             is UiEffect.NavigateToDiscount -> navigateToDiscount()
+            is UiEffect.NavigateToProducts -> navigateToProducts()
         }
     }
     when {
@@ -83,7 +76,8 @@ fun HomeScreen(
             onCategoryClick = onCategoryClick,
             onAction = onAction,
             navigateToSearch = navigateToSearch,
-            navigateToDiscount = navigateToDiscount
+            navigateToDiscount = navigateToDiscount,
+            navigateToProducts = navigateToProducts
         )
     }
 }
@@ -94,8 +88,12 @@ fun HomeContent(
     onCategoryClick: (String?) -> Unit,
     onAction: (UiAction) -> Unit,
     navigateToSearch: () -> Unit,
-    navigateToDiscount: () -> Unit
+    navigateToDiscount: () -> Unit,
+    navigateToProducts: () -> Unit
 ) {
+
+    val uniqueCategories = uiState.productList.distinctBy { it.category }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -141,116 +139,52 @@ fun HomeContent(
             modifier = Modifier.padding(start = 8.dp, top = 16.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        CategoryList(
-            uiState = uiState,
-            onCategoryClick = onCategoryClick
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (uiState.productList.isNotEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(uiState.productList) { product ->
-                    ProductCard(product = product)
-                }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+        ) {
+            items(uniqueCategories) { product ->
+                CategoryCard(product = product)
             }
-        } else {
-            Text(
-                text = stringResource(R.string.there_is_no_product_text),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
-    }
-}
-
-@Composable
-fun DiscountedProductCard(product: Product) {
-    Column(
-        modifier = Modifier.padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current).data(product.imageOne).build(),
-            contentDescription = product.title,
-            modifier = Modifier.size(120.dp)
-        )
-        Text(
-            text = product.title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
         ) {
             Text(
-                text = if (product.saleState) "₺${product.salePrice}" else "₺${product.price}",
+                text = "Popüler Ürünler",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
-            if (product.saleState) {
-                Text(
-                    text = "₺${product.price}",
-                    color = Color.Red,
-                    style = TextStyle(
-                        textDecoration = TextDecoration.LineThrough
-                    )
-                )
+            Spacer(modifier = Modifier.weight(1f))
 
-            }
+            Text(
+                text = "Tüm Ürünler",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier
+                    .clickable {
+                        navigateToProducts()
+                    }
+
+            )
+
         }
+
+        PopularProductRow(
+            product = uiState.productList
+        )
+
     }
 }
 
-@Composable
-fun DiscountedCard(
-    navigateToDiscount: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(16.dp)
-            .clip(shape = RoundedCornerShape(32.dp))
-            .background(colorResource(R.color.dark_gray))
-            .clickable {
-                navigateToDiscount()
-            },
 
-        ) {
-        Text(
-            text = "%50'ye varan\n indirim fırsatlarını\n kaçırma!",
-            fontSize = 24.sp,
-            color = Color.White,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(16.dp)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.mouse),
-            contentDescription = "Sale",
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 24.dp)
-                .rotate(-25f)
-
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -264,6 +198,8 @@ fun HomeScreenPreview(
         userId = "userId",
         onCategoryClick = {},
         navigateToSearch = {},
-        navigateToDiscount = {}
+        navigateToDiscount = {},
+        navigateToProducts = {}
+
     )
 }

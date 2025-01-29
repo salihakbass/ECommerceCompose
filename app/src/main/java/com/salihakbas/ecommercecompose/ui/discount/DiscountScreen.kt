@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.discount
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -25,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.salihakbas.ecommercecompose.R
+import com.salihakbas.ecommercecompose.common.collectWithLifecycle
 import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
 import com.salihakbas.ecommercecompose.ui.components.LoadingBar
@@ -38,37 +43,62 @@ fun DiscountScreen(
     uiState: UiState,
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
+    navigateBack: () -> Unit
 ) {
+    uiEffect.collectWithLifecycle { effect ->
+        when (effect) {
+            is UiEffect.NavigateBack -> {}
+        }
+    }
     when {
         uiState.isLoading -> LoadingBar()
         uiState.list.isNotEmpty() -> EmptyScreen()
         else -> DiscountContent(
-            uiState = uiState
+            uiState = uiState,
+            navigateBack = navigateBack
         )
     }
 }
 
 @Composable
 fun DiscountContent(
-    uiState: UiState
+    uiState: UiState,
+    navigateBack: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "İndirimli Ürünler \uD83C\uDF89 \uD83C\uDF89 ",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clickable {
+                        navigateBack()
+                    }
+            )
+            Text(
+                text = stringResource(R.string.discount_chance_text),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
             items(uiState.discountList) { product ->
                 ProductItem(product)
             }
@@ -125,11 +155,11 @@ fun ProductItem(product: Product) {
                         )
                         Icon(
                             painter = painterResource(R.drawable.ic_discount),
-                            contentDescription = "Discount",
+                            contentDescription = stringResource(R.string.discount_icon_cd),
                             tint = Color.Red
                         )
                         Text(
-                            text = "%${discountPercentage} İndirim",
+                            text = stringResource(R.string.discount_text, discountPercentage),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Red

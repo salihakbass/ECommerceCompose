@@ -11,7 +11,9 @@ object DiscountContract {
 
     sealed class UiAction
 
-    sealed class UiEffect
+    sealed class UiEffect {
+        data object NavigateBack : UiEffect()
+    }
 
 
 }

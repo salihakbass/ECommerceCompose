@@ -26,8 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val fetchProductsUseCase: FetchProductsUseCase,
-    private val fetchCategoriesUseCase: FetchCategoriesUseCase,
-    private val searchProductsUseCase: SearchProductsUseCase
+    private val fetchCategoriesUseCase: FetchCategoriesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())

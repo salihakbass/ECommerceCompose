@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.salihakbas.ecommercecompose.domain.model.Product
-import com.salihakbas.ecommercecompose.ui.home.DotsIndicator
 
 @Composable
 fun SuggestedProductsCard(

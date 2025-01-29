@@ -15,5 +15,7 @@ object SearchContract {
         data class OnQueryChanged(val query: String) : UiAction()
     }
 
-    sealed class UiEffect
+    sealed class UiEffect {
+        data object NavigateBack : UiEffect()
+    }
 }

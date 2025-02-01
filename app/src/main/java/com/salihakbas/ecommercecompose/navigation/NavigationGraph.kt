@@ -24,6 +24,8 @@ import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordScreen
 import com.salihakbas.ecommercecompose.ui.forgotpassword.ForgotPasswordViewModel
 import com.salihakbas.ecommercecompose.ui.home.HomeScreen
 import com.salihakbas.ecommercecompose.ui.home.HomeViewModel
+import com.salihakbas.ecommercecompose.ui.product.ProductScreen
+import com.salihakbas.ecommercecompose.ui.product.ProductViewModel
 import com.salihakbas.ecommercecompose.ui.profile.ProfileScreen
 import com.salihakbas.ecommercecompose.ui.profile.ProfileViewModel
 import com.salihakbas.ecommercecompose.ui.search.SearchScreen
@@ -115,7 +117,7 @@ fun NavigationGraph(
                 onCategoryClick = { viewModel.filterProductsByCategory(it) },
                 navigateToSearch = { navController.navigate(Screen.Search) },
                 navigateToDiscount = { navController.navigate(Screen.Discount) },
-                navigateToProducts = { }
+                navigateToProducts = { navController.navigate(Screen.Product) }
             )
             LaunchedEffect(key1 = userId) {
                 viewModel.fetchUserFromRealtimeDatabase(userId)
@@ -186,6 +188,17 @@ fun NavigationGraph(
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Product> {
+            val viewModel: ProductViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val uiEffect = viewModel.uiEffect
+            ProductScreen(
+                uiState = uiState,
+                uiEffect = uiEffect,
+                onAction = viewModel::onAction,
             )
         }
 

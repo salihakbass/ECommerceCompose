@@ -199,6 +199,7 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
+                navigateBack = { navController.popBackStack() }
             )
         }
 

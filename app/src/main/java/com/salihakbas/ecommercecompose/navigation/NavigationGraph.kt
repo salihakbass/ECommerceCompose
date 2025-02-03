@@ -120,7 +120,7 @@ fun NavigationGraph(
                 navigateToSearch = { navController.navigate(Screen.Search) },
                 navigateToDiscount = { navController.navigate(Screen.Discount) },
                 navigateToProducts = { navController.navigate(Screen.Product) },
-                navigateToDetail = {productId ->
+                navigateToDetail = { productId ->
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
             )
@@ -132,7 +132,7 @@ fun NavigationGraph(
             route = "${Screen.getRoute(Screen.Detail(0))}/{productId}",
             arguments = listOf(navArgument("productId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getString("productId") ?: -1
+            val productId = backStackEntry.arguments?.getInt("productId") ?: -1
             val viewModel: DetailViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect

@@ -7,8 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.salihakbas.ecommercecompose.ui.cart.CartScreen
 import com.salihakbas.ecommercecompose.ui.cart.CartViewModel
@@ -117,17 +119,24 @@ fun NavigationGraph(
                 onCategoryClick = { viewModel.filterProductsByCategory(it) },
                 navigateToSearch = { navController.navigate(Screen.Search) },
                 navigateToDiscount = { navController.navigate(Screen.Discount) },
-                navigateToProducts = { navController.navigate(Screen.Product) }
+                navigateToProducts = { navController.navigate(Screen.Product) },
+                navigateToDetail = {productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
             LaunchedEffect(key1 = userId) {
                 viewModel.fetchUserFromRealtimeDatabase(userId)
             }
-
         }
-        composable<Screen.Detail> {
+        composable(
+            route = "${Screen.getRoute(Screen.Detail(0))}/{productId}",
+            arguments = listOf(navArgument("productId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: -1
             val viewModel: DetailViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect
+
             DetailScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,

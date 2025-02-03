@@ -1,4 +1,4 @@
-package com.salihakbas.ecommercecompose.data.source.remote
+package com.salihakbas.ecommercecompose.domain.model
 
 data class Category(
     val name: String,

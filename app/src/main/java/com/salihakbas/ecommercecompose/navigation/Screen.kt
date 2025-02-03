@@ -22,7 +22,7 @@ sealed interface Screen {
     data object Home : Screen
 
     @Serializable
-    data object Detail : Screen
+    data class Detail(val productId: Int) : Screen
 
     @Serializable
     data object Cart : Screen

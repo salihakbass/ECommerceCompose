@@ -54,13 +54,15 @@ fun HomeScreen(
     onCategoryClick: (String?) -> Unit,
     navigateToSearch: () -> Unit,
     navigateToDiscount: () -> Unit,
-    navigateToProducts: () -> Unit
+    navigateToProducts: () -> Unit,
+    navigateToDetail: (Int) -> Unit
 ) {
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
             is UiEffect.NavigateToSearch -> navigateToSearch()
             is UiEffect.NavigateToDiscount -> navigateToDiscount()
             is UiEffect.NavigateToProducts -> navigateToProducts()
+            is UiEffect.ProductClick -> navigateToDetail(effect.id)
         }
     }
     when {
@@ -72,7 +74,8 @@ fun HomeScreen(
             onAction = onAction,
             navigateToSearch = navigateToSearch,
             navigateToDiscount = navigateToDiscount,
-            navigateToProducts = navigateToProducts
+            navigateToProducts = navigateToProducts,
+            navigateToDetail = navigateToDetail
         )
     }
 }
@@ -84,7 +87,8 @@ fun HomeContent(
     onAction: (UiAction) -> Unit,
     navigateToSearch: () -> Unit,
     navigateToDiscount: () -> Unit,
-    navigateToProducts: () -> Unit
+    navigateToProducts: () -> Unit,
+    navigateToDetail: (Int) -> Unit
 ) {
 
     val uniqueCategories = uiState.productList.distinctBy { it.category }
@@ -175,7 +179,8 @@ fun HomeContent(
         }
 
         PopularProductRow(
-            product = uiState.productList
+            product = uiState.productList,
+            navigateToDetail = navigateToDetail
         )
 
     }
@@ -195,7 +200,9 @@ fun HomeScreenPreview(
         onCategoryClick = {},
         navigateToSearch = {},
         navigateToDiscount = {},
-        navigateToProducts = {}
+        navigateToProducts = {},
+        navigateToDetail = {}
+
 
     )
 }

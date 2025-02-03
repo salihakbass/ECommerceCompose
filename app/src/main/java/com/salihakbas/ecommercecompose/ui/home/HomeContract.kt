@@ -16,12 +16,12 @@ object HomeContract {
         val errorMessage: String? = null,
     )
 
-    sealed class UiAction {
-    }
+    sealed class UiAction
 
     sealed class UiEffect {
         data object NavigateToSearch : UiEffect()
-        data object NavigateToDiscount: UiEffect()
-        data object NavigateToProducts: UiEffect()
+        data object NavigateToDiscount : UiEffect()
+        data object NavigateToProducts : UiEffect()
+        data class ProductClick(val id: Int) : UiEffect()
     }
 }

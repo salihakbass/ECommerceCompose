@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,7 +23,8 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 
 @Composable
 fun PopularProductList(
-    product: Product
+    product: Product,
+    navigateToDetail: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(24.dp),
@@ -31,7 +33,11 @@ fun PopularProductList(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current).data(product.imageOne).build(),
             contentDescription = product.title,
-            modifier = Modifier.size(140.dp)
+            modifier = Modifier
+                .size(140.dp)
+                .clickable {
+                    navigateToDetail(product.id)
+                }
 
         )
         Text(
@@ -53,7 +59,8 @@ fun PopularProductList(
 
 @Composable
 fun PopularProductRow(
-    product: List<Product>
+    product: List<Product>,
+    navigateToDetail: (Int) -> Unit
 ) {
     val popularProducts = remember {
         product.shuffled().take(6)
@@ -62,7 +69,12 @@ fun PopularProductRow(
         modifier = Modifier.fillMaxWidth()
     ) {
         items(popularProducts) { product ->
-            PopularProductList(product = product)
+            PopularProductList(
+                product = product,
+                navigateToDetail = navigateToDetail
+            )
+
+
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.salihakbas.ecommercecompose.domain.usecase
 
 import com.salihakbas.ecommercecompose.common.Resource
-import com.salihakbas.ecommercecompose.data.source.remote.Category
+import com.salihakbas.ecommercecompose.domain.model.Category
 import com.salihakbas.ecommercecompose.domain.repository.MainRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,7 +21,6 @@ class FetchCategoriesUseCase @Inject constructor(
             } catch (e: Exception) {
                 emit(Resource.Error(message = e.localizedMessage ?: "Unknown error!"))
             }
-
         }
     }
 }

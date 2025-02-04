@@ -3,16 +3,19 @@ package com.salihakbas.ecommercecompose.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation.compose.rememberNavController
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.salihakbas.ecommercecompose.navigation.BottomNavigation
 import com.salihakbas.ecommercecompose.navigation.NavigationGraph
 import com.salihakbas.ecommercecompose.navigation.Screen
-import dagger.hilt.android.AndroidEntryPoint
 import com.salihakbas.ecommercecompose.ui.theme.MyappTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -21,9 +24,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController = rememberNavController()
-                    val startDestination = Screen.Splash
+                val navController = rememberNavController()
+                val startDestination = Screen.Home
+
+                val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = currentBackStackEntry?.destination?.route
+
+                val bottomNavScreens = listOf(
+                    Screen.Home,
+                    Screen.Cart,
+                    Screen.Favorites,
+                    Screen.Profile
+                )
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (Screen.showBottomBar(currentDestination)) {
+                            BottomNavigation(navController)
+                        }
+                    }
+                ) { innerPadding ->
                     NavigationGraph(
                         navController = navController,
                         startDestination = startDestination,

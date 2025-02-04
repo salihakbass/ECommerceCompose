@@ -30,5 +30,9 @@ class MainRepositoryImpl @Inject constructor(
         return mainService.getProductDetail(id)
     }
 
+    override suspend fun getProductsByCategory(category: String): ProductResponse {
+        return mainService.getProductsByCategory(category)
+    }
+
 
 }

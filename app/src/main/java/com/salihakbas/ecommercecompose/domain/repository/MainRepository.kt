@@ -8,7 +8,8 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 interface MainRepository {
     suspend fun fetchProducts(): List<Product>
     suspend fun fetchCategories(): CategoryResponse
-    suspend fun searchProducts(query:String): ProductResponse
+    suspend fun searchProducts(query: String): ProductResponse
     suspend fun getProductDetail(id: Int): ProductDetailResponse
+    suspend fun getProductsByCategory(category: String): ProductResponse
 
 }

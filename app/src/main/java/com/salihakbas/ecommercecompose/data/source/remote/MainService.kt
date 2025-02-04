@@ -12,15 +12,20 @@ interface MainService {
     suspend fun getProducts(): ProductResponse
 
     @GET("get_categories.php")
-    suspend fun getCategories() : CategoryResponse
+    suspend fun getCategories(): CategoryResponse
 
     @GET("search_product.php")
     suspend fun searchProducts(
         @Query("query") query: String
-    ) : ProductResponse
+    ): ProductResponse
 
     @GET("get_product_detail.php")
     suspend fun getProductDetail(
         @Query("id") id: Int
-    ) : ProductDetailResponse
+    ): ProductDetailResponse
+
+    @GET("get_products_by_category.php")
+    suspend fun getProductsByCategory(
+        @Query("category") category: String
+    ): ProductResponse
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salihakbas.ecommercecompose.common.Resource
 import com.salihakbas.ecommercecompose.domain.usecase.GetProductDetailUseCase
+import com.salihakbas.ecommercecompose.domain.usecase.GetProductsByCategoryUseCase
 import com.salihakbas.ecommercecompose.ui.detail.DetailContract.UiAction
 import com.salihakbas.ecommercecompose.ui.detail.DetailContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.detail.DetailContract.UiState
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getProductDetailUseCase: GetProductDetailUseCase
+    private val getProductDetailUseCase: GetProductDetailUseCase,
+    private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -43,8 +45,23 @@ class DetailViewModel @Inject constructor(
         when (val resource = getProductDetailUseCase(productId)) {
             is Resource.Success -> {
                 updateUiState { copy(product = resource.data) }
+                resource.data.category?.let { getSimilarProducts(it) }
             }
 
+            is Resource.Error -> {
+                updateUiState { copy(error = resource.message) }
+            }
+        }
+    }
+
+    private fun getSimilarProducts(category: String) = viewModelScope.launch {
+        val currentProductId = _uiState.value.product?.id
+
+        when(val resource = getProductsByCategoryUseCase(category)) {
+            is Resource.Success -> {
+                val filteredList = resource.data.filter { it.id != currentProductId }
+                updateUiState { copy(similarProducts = filteredList) }
+            }
             is Resource.Error -> {
                 updateUiState { copy(error = resource.message) }
             }

@@ -1,6 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.home
 
-import com.salihakbas.ecommercecompose.data.source.remote.Category
+import com.salihakbas.ecommercecompose.domain.model.Category
 import com.salihakbas.ecommercecompose.domain.model.Product
 
 object HomeContract {
@@ -23,5 +23,6 @@ object HomeContract {
         data object NavigateToDiscount : UiEffect()
         data object NavigateToProducts : UiEffect()
         data class ProductClick(val id: Int) : UiEffect()
+        data class OnCategoryClick(val categoryName: String) : UiEffect()
     }
 }

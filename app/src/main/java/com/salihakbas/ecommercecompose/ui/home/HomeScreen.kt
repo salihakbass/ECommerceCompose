@@ -51,7 +51,7 @@ fun HomeScreen(
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
     userId: String,
-    onCategoryClick: (String?) -> Unit,
+    onCategoryClick: (String) -> Unit,
     navigateToSearch: () -> Unit,
     navigateToDiscount: () -> Unit,
     navigateToProducts: () -> Unit,
@@ -63,6 +63,7 @@ fun HomeScreen(
             is UiEffect.NavigateToDiscount -> navigateToDiscount()
             is UiEffect.NavigateToProducts -> navigateToProducts()
             is UiEffect.ProductClick -> navigateToDetail(effect.id)
+            is UiEffect.OnCategoryClick -> onCategoryClick(effect.categoryName)
         }
     }
     when {
@@ -83,7 +84,7 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     uiState: UiState,
-    onCategoryClick: (String?) -> Unit,
+    onCategoryClick: (String) -> Unit,
     onAction: (UiAction) -> Unit,
     navigateToSearch: () -> Unit,
     navigateToDiscount: () -> Unit,
@@ -146,7 +147,10 @@ fun HomeContent(
                 .height(300.dp),
         ) {
             items(uniqueCategories) { product ->
-                CategoryCard(product = product)
+                CategoryCard(
+                    product = product,
+                    onCategoryClick = onCategoryClick
+                )
             }
         }
         Row(

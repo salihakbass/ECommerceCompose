@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,11 +20,15 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 
 @Composable
 fun CategoryCard(
-    product: Product
+    product: Product,
+    onCategoryClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
             .padding(8.dp)
+            .clickable {
+                onCategoryClick(product.category)
+            }
     ) {
         Card(
             modifier = Modifier
@@ -43,8 +48,6 @@ fun CategoryCard(
             fontSize = 12.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-
-
     }
 }
 

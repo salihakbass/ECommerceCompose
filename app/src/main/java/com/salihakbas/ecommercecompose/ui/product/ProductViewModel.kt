@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.product
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salihakbas.ecommercecompose.common.Resource
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val fetchProductsUseCase: FetchProductsUseCase
 ) : ViewModel() {
 
@@ -30,21 +32,28 @@ class ProductViewModel @Inject constructor(
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
     init {
-        fetchProducts()
+        val categoryName = savedStateHandle.get<String>("categoryName") ?: "Tümü"
+        fetchProductsByCategory(categoryName)
     }
 
-    fun onAction(uiAction: UiAction) {
+    fun onAction(uiAction: UiAction) {}
 
-    }
-
-    private fun fetchProducts() = viewModelScope.launch {
+    private fun fetchProductsByCategory(category: String) = viewModelScope.launch {
         updateUiState { copy(isLoading = true) }
+
         when (val result = fetchProductsUseCase()) {
             is Resource.Success -> {
+                val productList = result.data
+                val filteredProducts = if (category == "Tümü") {
+                    productList
+                } else {
+                    productList.filter { it.category == category }
+                }
+
                 updateUiState {
                     copy(
                         isLoading = false,
-                        productList = result.data
+                        productList = filteredProducts
                     )
                 }
             }
@@ -54,6 +63,7 @@ class ProductViewModel @Inject constructor(
             }
         }
     }
+
 
     private fun updateUiState(block: UiState.() -> UiState) {
         _uiState.update(block)

@@ -116,10 +116,14 @@ fun NavigationGraph(
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
                 userId = userId,
-                onCategoryClick = { viewModel.filterProductsByCategory(it) },
+                onCategoryClick = {
+                    navController.navigate("${Screen.getRoute(Screen.Product(""))}/$it")
+                },
                 navigateToSearch = { navController.navigate(Screen.Search) },
                 navigateToDiscount = { navController.navigate(Screen.Discount) },
-                navigateToProducts = { navController.navigate(Screen.Product) },
+                navigateToProducts = {
+                    navController.navigate("${Screen.getRoute(Screen.Product(""))}/Tümü")
+                },
                 navigateToDetail = { productId ->
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
@@ -140,7 +144,10 @@ fun NavigationGraph(
             DetailScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navController = navController,
+                onBackClick = {navController.popBackStack()},
+                navigateToSearch = {navController.navigate(Screen.Search)}
             )
         }
         composable<Screen.Cart> {
@@ -200,7 +207,10 @@ fun NavigationGraph(
             )
         }
 
-        composable<Screen.Product> {
+        composable(
+            route = "${Screen.getRoute(Screen.Product(""))}/{categoryName}",
+            arguments = listOf(navArgument("categoryName") { type = NavType.StringType })
+        ) {
             val viewModel: ProductViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect

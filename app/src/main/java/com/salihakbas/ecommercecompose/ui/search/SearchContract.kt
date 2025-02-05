@@ -17,5 +17,6 @@ object SearchContract {
 
     sealed class UiEffect {
         data object NavigateBack : UiEffect()
+        data class NavigateDetail(val id: Int) : UiEffect()
     }
 }

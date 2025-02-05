@@ -4,7 +4,7 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 
 object ProductContract {
     data class UiState(
-        val isLoading : Boolean = false,
+        val isLoading: Boolean = false,
         val list: List<String> = emptyList(),
         val productList: List<Product> = emptyList()
     )
@@ -13,5 +13,6 @@ object ProductContract {
 
     sealed class UiEffect {
         data object NavigateBack : UiEffect()
+        data class NavigateDetail(val id: Int) : UiEffect()
     }
 }

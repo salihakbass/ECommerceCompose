@@ -43,11 +43,13 @@ fun DiscountScreen(
     uiState: UiState,
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToDetail: (Int) -> Unit
 ) {
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
-            is UiEffect.NavigateBack -> {}
+            is UiEffect.NavigateBack -> navigateBack()
+            is UiEffect.NavigateToDetail -> navigateToDetail(effect.id)
         }
     }
     when {
@@ -55,7 +57,8 @@ fun DiscountScreen(
         uiState.list.isNotEmpty() -> EmptyScreen()
         else -> DiscountContent(
             uiState = uiState,
-            navigateBack = navigateBack
+            navigateBack = navigateBack,
+            navigateToDetail = navigateToDetail
         )
     }
 }
@@ -63,7 +66,8 @@ fun DiscountScreen(
 @Composable
 fun DiscountContent(
     uiState: UiState,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToDetail: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -100,7 +104,10 @@ fun DiscountContent(
                 .padding(16.dp)
         ) {
             items(uiState.discountList) { product ->
-                ProductItem(product)
+                ProductItem(
+                    product,
+                    navigateToDetail = navigateToDetail
+                )
             }
         }
     }
@@ -108,7 +115,10 @@ fun DiscountContent(
 }
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(
+    product: Product,
+    navigateToDetail: (Int) -> Unit
+) {
     val discountPercentage = if (product.salePrice != null) {
         ((product.price - product.salePrice) / product.price * 100).toInt()
     } else {
@@ -118,6 +128,9 @@ fun ProductItem(product: Product) {
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
+            .clickable {
+                navigateToDetail(product.id)
+            }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

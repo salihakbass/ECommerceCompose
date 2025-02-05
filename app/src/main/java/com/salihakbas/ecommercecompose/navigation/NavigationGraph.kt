@@ -191,7 +191,10 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateDetail = { productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
         }
 
@@ -203,7 +206,10 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToDetail = { productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
         }
 
@@ -218,7 +224,10 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToDetail = { productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
         }
 

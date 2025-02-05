@@ -55,7 +55,8 @@ fun SearchScreen(
     uiState: UiState,
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateDetail: (Int) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -68,8 +69,9 @@ fun SearchScreen(
         }
     }
     uiEffect.collectWithLifecycle { effect ->
-        when(effect) {
+        when (effect) {
             is UiEffect.NavigateBack -> navigateBack()
+            is UiEffect.NavigateDetail -> navigateDetail(effect.id)
         }
 
     }
@@ -81,7 +83,8 @@ fun SearchScreen(
             uiState = uiState,
             onAction = onAction,
             focusRequester = focusRequester,
-            navigateBack = navigateBack
+            navigateBack = navigateBack,
+            navigateDetail = navigateDetail
         )
     }
 }
@@ -91,7 +94,8 @@ fun SearchContent(
     uiState: UiState,
     onAction: (UiAction) -> Unit,
     focusRequester: FocusRequester,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateDetail: (Int) -> Unit
 ) {
     val popularItems = listOf("Msi", "Asus", "Lenovo", "SteelSeries", "Razer")
     Column(
@@ -181,6 +185,7 @@ fun SearchContent(
         } else {
             SuggestedProductsPager(
                 products = uiState.suggestedProducts,
+                navigateToDetail = navigateDetail
             )
         }
 
@@ -196,7 +201,8 @@ fun SearchScreenPreview(
         uiState = uiState,
         uiEffect = emptyFlow(),
         onAction = {},
-        navigateBack = {}
+        navigateBack = {},
+        navigateDetail = {}
     )
 }
 

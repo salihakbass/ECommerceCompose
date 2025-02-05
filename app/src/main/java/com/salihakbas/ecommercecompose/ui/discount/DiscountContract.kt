@@ -13,6 +13,7 @@ object DiscountContract {
 
     sealed class UiEffect {
         data object NavigateBack : UiEffect()
+        data class NavigateToDetail(val id: Int) : UiEffect()
     }
 
 

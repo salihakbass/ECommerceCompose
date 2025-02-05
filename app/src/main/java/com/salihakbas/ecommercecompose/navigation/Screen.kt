@@ -40,7 +40,7 @@ sealed interface Screen {
     data object Discount : Screen
 
     @Serializable
-    data object Product : Screen
+    data class Product(val categoryName: String) : Screen
 
     companion object {
         fun getRoute(screen: Screen): String = screen::class.qualifiedName.orEmpty()

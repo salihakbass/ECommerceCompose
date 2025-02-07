@@ -12,6 +12,7 @@ object CartContract {
 
     sealed class UiAction {
         data class ClearCart(val userId: String) : UiAction()
+        data class DeleteFromCart(val id: Int,val userId: String) : UiAction()
     }
 
     sealed class UiEffect

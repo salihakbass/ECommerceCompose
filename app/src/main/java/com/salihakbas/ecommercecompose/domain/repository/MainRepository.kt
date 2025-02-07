@@ -16,4 +16,5 @@ interface MainRepository {
     suspend fun addToCart(userId: String, productId: Int): BaseResponse
     suspend fun getCartProducts(userId: String): ProductResponse
     suspend fun clearCart(userId: String): BaseResponse
+    suspend fun deleteFromCart(id: Int,userId: String) : BaseResponse
 }

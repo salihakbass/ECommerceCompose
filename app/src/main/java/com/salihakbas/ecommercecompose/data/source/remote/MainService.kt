@@ -6,6 +6,7 @@ import com.salihakbas.ecommercecompose.data.source.remote.model.response.Product
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
 import com.salihakbas.ecommercecompose.domain.model.AddToCartRequest
 import com.salihakbas.ecommercecompose.domain.model.ClearCartRequest
+import com.salihakbas.ecommercecompose.domain.model.DeleteFromCartRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -48,4 +49,9 @@ interface MainService {
     suspend fun clearCart(
         @Body request: ClearCartRequest
     ): BaseResponse
+
+    @POST("delete_from_cart.php")
+    suspend fun deleteFromCart(
+        @Body request: DeleteFromCartRequest
+    ) : BaseResponse
 }

@@ -172,7 +172,7 @@ fun ProductItem(
                             tint = Color.Red
                         )
                         Text(
-                            text = stringResource(R.string.discount_text, discountPercentage),
+                            text = "%${discountPercentage} İndirim",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Red

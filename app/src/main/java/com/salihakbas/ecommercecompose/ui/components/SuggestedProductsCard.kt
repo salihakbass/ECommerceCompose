@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +32,7 @@ import com.salihakbas.ecommercecompose.domain.model.Product
 
 @Composable
 fun SuggestedProductsCard(
-    product: Product,
-    onProductClick: () -> Unit
+    product: Product
 ) {
     Column(
         modifier = Modifier.padding(8.dp),
@@ -68,7 +68,10 @@ fun SuggestedProductsCard(
 }
 
 @Composable
-fun SuggestedProductsPager(products: List<Product>) {
+fun SuggestedProductsPager(
+    products: List<Product>,
+    navigateToDetail: (Int) -> Unit
+) {
     val suggestedProducts = remember {
         products.filter { !it.saleState }.shuffled().take(5)
     }
@@ -97,15 +100,17 @@ fun SuggestedProductsPager(products: List<Product>) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .clickable {
+                        navigateToDetail(product.id)
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SuggestedProductsCard(
-                        product = product,
-                        onProductClick = {}
+                        product = product
                     )
                 }
             }

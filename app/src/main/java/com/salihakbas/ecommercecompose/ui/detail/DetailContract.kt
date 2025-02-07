@@ -12,7 +12,9 @@ object DetailContract {
         val similarProducts: List<Product> = emptyList()
     )
 
-    sealed class UiAction
+    sealed class UiAction {
+        data class AddToCart(val userId: String, val productId: Int) : UiAction()
+    }
 
     sealed class UiEffect {
         data object NavigateBack : UiEffect()

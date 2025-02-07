@@ -1,6 +1,9 @@
 package com.salihakbas.ecommercecompose.ui.cart
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.domain.usecase.GetCartProductsUseCase
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiAction
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiState
@@ -12,10 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CartViewModel @Inject constructor() : ViewModel() {
+class CartViewModel @Inject constructor(
+    private val getCartProductsUseCase: GetCartProductsUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -24,6 +30,21 @@ class CartViewModel @Inject constructor() : ViewModel() {
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
     fun onAction(uiAction: UiAction) {
+
+    }
+
+     fun getCartProducts(userId: String) = viewModelScope.launch {
+        updateUiState { copy(isLoading = true) }
+
+        when(val result = getCartProductsUseCase(userId)) {
+            is Resource.Success -> {
+                updateUiState { copy(products = result.data ?: emptyList(), isLoading = false) }
+            }
+            is Resource.Error -> {
+                updateUiState { copy(error = result.message ?: "Error", isLoading = false) }
+            }
+
+        }
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

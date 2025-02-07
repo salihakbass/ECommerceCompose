@@ -1,9 +1,13 @@
 package com.salihakbas.ecommercecompose.data.source.remote
 
+import com.salihakbas.ecommercecompose.data.source.remote.model.response.BaseResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.CategoryResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductDetailResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
+import com.salihakbas.ecommercecompose.domain.model.AddToCartRequest
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 
@@ -28,4 +32,14 @@ interface MainService {
     suspend fun getProductsByCategory(
         @Query("category") category: String
     ): ProductResponse
+
+    @POST("add_to_cart.php")
+    suspend fun addToCart(
+    @Body request: AddToCartRequest
+    ) : BaseResponse
+
+    @GET("get_cart_products.php")
+    suspend fun getCartProducts(
+        @Query("userId") userId: String
+    ) : ProductResponse
 }

@@ -2,9 +2,11 @@ package com.salihakbas.ecommercecompose.data.repository
 
 import com.salihakbas.ecommercecompose.data.source.local.MainDao
 import com.salihakbas.ecommercecompose.data.source.remote.MainService
+import com.salihakbas.ecommercecompose.data.source.remote.model.response.BaseResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.CategoryResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductDetailResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
+import com.salihakbas.ecommercecompose.domain.model.AddToCartRequest
 import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.domain.repository.MainRepository
 import javax.inject.Inject
@@ -32,6 +34,14 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun getProductsByCategory(category: String): ProductResponse {
         return mainService.getProductsByCategory(category)
+    }
+
+    override suspend fun addToCart(userId: String, productId: Int): BaseResponse {
+        return mainService.addToCart(AddToCartRequest(userId, productId))
+    }
+
+    override suspend fun getCartProducts(userId: String): ProductResponse {
+        return mainService.getCartProducts(userId)
     }
 
 

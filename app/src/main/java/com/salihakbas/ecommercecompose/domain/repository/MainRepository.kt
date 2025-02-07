@@ -1,5 +1,6 @@
 package com.salihakbas.ecommercecompose.domain.repository
 
+import com.salihakbas.ecommercecompose.data.source.remote.model.response.BaseResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.CategoryResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductDetailResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
@@ -12,4 +13,6 @@ interface MainRepository {
     suspend fun getProductDetail(id: Int): ProductDetailResponse
     suspend fun getProductsByCategory(category: String): ProductResponse
 
+    suspend fun addToCart(userId: String, productId: Int) : BaseResponse
+    suspend fun getCartProducts(userId: String) : ProductResponse
 }

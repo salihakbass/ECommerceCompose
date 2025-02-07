@@ -60,7 +60,8 @@ fun DetailScreen(
     onAction: (UiAction) -> Unit,
     navController: NavController,
     onBackClick: () -> Unit,
-    navigateToSearch: () -> Unit
+    navigateToSearch: () -> Unit,
+    userId: String
 ) {
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
@@ -71,6 +72,8 @@ fun DetailScreen(
             UiEffect.NavigateSearch -> {
                 navigateToSearch()
             }
+
+
         }
     }
     Scaffold(
@@ -84,8 +87,12 @@ fun DetailScreen(
             BottomBar(
                 priceText = uiState.product?.price.toString(),
                 salePriceText = uiState.product?.salePrice.toString(),
-                addToCartClick = { },
-                uiState = uiState
+                uiState = uiState,
+                addToCartClick = {
+                    uiState.product?.let { product ->
+                        onAction(UiAction.AddToCart(userId, product.id))
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -207,8 +214,8 @@ fun TopBar(
 fun BottomBar(
     priceText: String,
     salePriceText: String,
-    addToCartClick: () -> Unit,
-    uiState: UiState
+    uiState: UiState,
+    addToCartClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -310,7 +317,8 @@ fun DetailScreenPreview(
         onAction = {},
         navController = NavController(LocalContext.current),
         onBackClick = {},
-        navigateToSearch = {}
+        navigateToSearch = {},
+        userId = ""
 
 
     )

@@ -1,9 +1,11 @@
 package com.salihakbas.ecommercecompose.ui.detail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.domain.usecase.AddToCartUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.GetProductDetailUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.GetProductsByCategoryUseCase
 import com.salihakbas.ecommercecompose.ui.detail.DetailContract.UiAction
@@ -24,7 +26,8 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getProductDetailUseCase: GetProductDetailUseCase,
-    private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase
+    private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase,
+    private val addToCartUseCase: AddToCartUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -39,6 +42,9 @@ class DetailViewModel @Inject constructor(
     }
 
     fun onAction(uiAction: UiAction) {
+        when (uiAction) {
+            is UiAction.AddToCart -> addToCart(uiAction.userId, uiAction.productId)
+        }
     }
 
     private fun getProductDetail(productId: Int) = viewModelScope.launch {
@@ -64,6 +70,23 @@ class DetailViewModel @Inject constructor(
             }
             is Resource.Error -> {
                 updateUiState { copy(error = resource.message) }
+            }
+        }
+    }
+
+    private fun addToCart(userId: String,productId: Int) = viewModelScope.launch {
+        updateUiState { copy(isLoading = true) }
+
+        when(val resource = addToCartUseCase(userId, productId)) {
+            is Resource.Success -> {
+                updateUiState { copy(isLoading = false) }
+                Log.d("Cart", "Product added to cart: ${resource.data}")
+                Log.d("Cart", "Product added to cart: $productId")
+            }
+
+            is Resource.Error -> {
+                updateUiState { copy(isLoading = false, error = resource.message) }
+
             }
         }
     }

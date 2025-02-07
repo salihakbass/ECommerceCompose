@@ -37,6 +37,7 @@ class SignInViewModel @Inject constructor(
             UiAction.SignInClicked -> signIn()
             UiAction.ForgotPasswordClicked -> forgotPassword()
             UiAction.SignUpClicked -> navigateToSignUp()
+            is UiAction.OnCheckboxToggle -> updateUiState { copy(isCheckboxChecked = uiAction.isCheckboxChecked) }
         }
     }
 

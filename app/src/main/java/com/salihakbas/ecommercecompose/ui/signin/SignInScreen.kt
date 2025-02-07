@@ -143,8 +143,8 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
             modifier = Modifier.fillMaxWidth()
         ) {
             Checkbox(
-                checked = false,
-                onCheckedChange = {}
+                checked = uiState.isCheckboxChecked,
+                onCheckedChange = {onAction(UiAction.OnCheckboxToggle(it))}
             )
             Text(
                 text = stringResource(R.string.remember_me_text),

@@ -13,6 +13,7 @@ interface MainRepository {
     suspend fun getProductDetail(id: Int): ProductDetailResponse
     suspend fun getProductsByCategory(category: String): ProductResponse
 
-    suspend fun addToCart(userId: String, productId: Int) : BaseResponse
-    suspend fun getCartProducts(userId: String) : ProductResponse
+    suspend fun addToCart(userId: String, productId: Int): BaseResponse
+    suspend fun getCartProducts(userId: String): ProductResponse
+    suspend fun clearCart(userId: String): BaseResponse
 }

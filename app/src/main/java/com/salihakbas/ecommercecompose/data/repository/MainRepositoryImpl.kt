@@ -7,6 +7,7 @@ import com.salihakbas.ecommercecompose.data.source.remote.model.response.Categor
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductDetailResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
 import com.salihakbas.ecommercecompose.domain.model.AddToCartRequest
+import com.salihakbas.ecommercecompose.domain.model.ClearCartRequest
 import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.domain.repository.MainRepository
 import javax.inject.Inject
@@ -42,6 +43,10 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun getCartProducts(userId: String): ProductResponse {
         return mainService.getCartProducts(userId)
+    }
+
+    override suspend fun clearCart(userId: String): BaseResponse {
+        return mainService.clearCart(ClearCartRequest(userId))
     }
 
 

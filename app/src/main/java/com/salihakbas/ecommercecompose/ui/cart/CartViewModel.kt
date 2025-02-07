@@ -3,6 +3,7 @@ package com.salihakbas.ecommercecompose.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.domain.usecase.ClearCartUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.GetCartProductsUseCase
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiAction
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiEffect
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val getCartProductsUseCase: GetCartProductsUseCase
+    private val getCartProductsUseCase: GetCartProductsUseCase,
+    private val clearCartUseCase: ClearCartUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -30,20 +32,37 @@ class CartViewModel @Inject constructor(
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
     fun onAction(uiAction: UiAction) {
-
+        when (uiAction) {
+            is UiAction.ClearCart -> clearCart(uiAction.userId)
+        }
     }
 
-     fun getCartProducts(userId: String) = viewModelScope.launch {
+    fun getCartProducts(userId: String) = viewModelScope.launch {
         updateUiState { copy(isLoading = true) }
 
-        when(val result = getCartProductsUseCase(userId)) {
+        when (val result = getCartProductsUseCase(userId)) {
             is Resource.Success -> {
-                updateUiState { copy(products = result.data ?: emptyList(), isLoading = false) }
-            }
-            is Resource.Error -> {
-                updateUiState { copy(error = result.message ?: "Error", isLoading = false) }
+                updateUiState { copy(products = result.data, isLoading = false) }
             }
 
+            is Resource.Error -> {
+                updateUiState { copy(error = result.message, isLoading = false) }
+            }
+
+        }
+    }
+
+    private fun clearCart(userId: String) = viewModelScope.launch {
+        updateUiState { copy(isLoading = true) }
+
+        when (val result = clearCartUseCase(userId)) {
+            is Resource.Success -> {
+                updateUiState { copy(isLoading = false, products = emptyList()) }
+            }
+
+            is Resource.Error -> {
+                updateUiState { copy(error = result.message, isLoading = false) }
+            }
         }
     }
 

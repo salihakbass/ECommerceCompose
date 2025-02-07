@@ -5,6 +5,7 @@ import com.salihakbas.ecommercecompose.data.source.remote.model.response.Categor
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductDetailResponse
 import com.salihakbas.ecommercecompose.data.source.remote.model.response.ProductResponse
 import com.salihakbas.ecommercecompose.domain.model.AddToCartRequest
+import com.salihakbas.ecommercecompose.domain.model.ClearCartRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -35,11 +36,16 @@ interface MainService {
 
     @POST("add_to_cart.php")
     suspend fun addToCart(
-    @Body request: AddToCartRequest
-    ) : BaseResponse
+        @Body request: AddToCartRequest
+    ): BaseResponse
 
     @GET("get_cart_products.php")
     suspend fun getCartProducts(
         @Query("userId") userId: String
-    ) : ProductResponse
+    ): ProductResponse
+
+    @POST("clear_cart.php")
+    suspend fun clearCart(
+        @Body request: ClearCartRequest
+    ): BaseResponse
 }

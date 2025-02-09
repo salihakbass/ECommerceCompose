@@ -70,10 +70,9 @@ class CartViewModel @Inject constructor(
     }
 
     private fun deleteFromCart(id: Int, userId: String) = viewModelScope.launch {
-
         when (val result = deleteFromCartUseCase(id, userId)) {
             is Resource.Success -> {
-                updateUiState { copy(isLoading = false, isRemoved = true) }
+                updateUiState { copy(isLoading = false) }
                 getCartProducts(userId)
             }
 

@@ -33,7 +33,6 @@ class CartViewModel @Inject constructor(
     private val _uiEffect by lazy { Channel<UiEffect>() }
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
-
     fun onAction(uiAction: UiAction) {
         when (uiAction) {
             is UiAction.ClearCart -> clearCart(uiAction.userId)
@@ -52,7 +51,6 @@ class CartViewModel @Inject constructor(
             is Resource.Error -> {
                 updateUiState { copy(error = result.message, isLoading = false) }
             }
-
         }
     }
 
@@ -72,13 +70,11 @@ class CartViewModel @Inject constructor(
     }
 
     private fun deleteFromCart(id: Int, userId: String) = viewModelScope.launch {
-        updateUiState { copy(isLoading = true) }
 
         when (val result = deleteFromCartUseCase(id, userId)) {
             is Resource.Success -> {
-                updateUiState { copy(isLoading = false) }
+                updateUiState { copy(isLoading = false, isRemoved = true) }
                 getCartProducts(userId)
-
             }
 
             is Resource.Error -> {

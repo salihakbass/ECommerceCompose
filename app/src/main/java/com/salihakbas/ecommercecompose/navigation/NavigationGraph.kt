@@ -44,6 +44,7 @@ fun NavigationGraph(
     navController: NavHostController,
     startDestination: Screen,
     modifier: Modifier = Modifier,
+
 ) {
     NavHost(
         modifier = modifier,
@@ -57,7 +58,8 @@ fun NavigationGraph(
             SplashScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navController = navController
             )
         }
         composable<Screen.SignIn> {
@@ -128,9 +130,6 @@ fun NavigationGraph(
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
             )
-            LaunchedEffect(key1 = userId) {
-                viewModel.fetchUserFromRealtimeDatabase(userId)
-            }
         }
         composable(
             route = "${Screen.getRoute(Screen.Detail(0))}/{productId}",
@@ -147,18 +146,25 @@ fun NavigationGraph(
                 onAction = viewModel::onAction,
                 navController = navController,
                 onBackClick = {navController.popBackStack()},
-                navigateToSearch = {navController.navigate(Screen.Search)}
+                navigateToSearch = {navController.navigate(Screen.Search)},
+                userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             )
         }
         composable<Screen.Cart> {
             val viewModel: CartViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val uiEffect = viewModel.uiEffect
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             CartScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                onBackClick = { navController.popBackStack() }
+
             )
+            LaunchedEffect(Unit) {
+                viewModel.getCartProducts(userId)
+            }
         }
         composable<Screen.Favorites> {
             val viewModel: FavoritesViewModel = hiltViewModel()
@@ -229,6 +235,7 @@ fun NavigationGraph(
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
             )
+
         }
 
 

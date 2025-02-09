@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -130,6 +132,7 @@ fun CartCard(
 ) {
     var isVisible by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
+    var quantity by remember { mutableStateOf(1) }
 
     AnimatedVisibility(
         visible = isVisible,
@@ -171,8 +174,14 @@ fun CartCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        val totalPrice = if (product.saleState) {
+                            (product.salePrice ?: 0.0) * quantity
+                        } else {
+                            product.price * quantity
+                        }
+
                         Text(
-                            text = if (product.saleState) "₺${product.salePrice}" else "₺${product.price}",
+                            text = "₺%.3f".format(totalPrice),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -192,6 +201,30 @@ fun CartCard(
                             fontSize = 16.sp,
                             textDecoration = TextDecoration.LineThrough,
                             color = Color.Red
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_remove),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clickable {
+                                    if (quantity > 1) quantity-- else showDialog = true
+                                }
+                        )
+                        Text(
+                            text = "$quantity"
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clickable {
+                                    quantity++
+                                }
                         )
                     }
                 }

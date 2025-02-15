@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.salihakbas.ecommercecompose.R
+import com.salihakbas.ecommercecompose.common.collectWithLifecycle
 import com.salihakbas.ecommercecompose.domain.model.Product
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiAction
 import com.salihakbas.ecommercecompose.ui.cart.CartContract.UiEffect
@@ -62,8 +63,14 @@ fun CartScreen(
     uiState: UiState,
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navigateCheckout: () -> Unit
 ) {
+    uiEffect.collectWithLifecycle { effect ->
+        when(effect) {
+            is UiEffect.NavigateCheckout -> navigateCheckout()
+        }
+    }
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     Scaffold(
         topBar = {
@@ -78,7 +85,7 @@ fun CartScreen(
         bottomBar = {
             BottomBarCart(
                 uiState = uiState,
-                onCheckoutClick = { }
+                onCheckoutClick = navigateCheckout
             )
         }
     ) { innerPadding ->
@@ -380,6 +387,7 @@ fun CartScreenPreview(
         uiState = uiState,
         uiEffect = emptyFlow(),
         onAction = {},
-        onBackClick = {}
+        onBackClick = {},
+        navigateCheckout = {}
     )
 }

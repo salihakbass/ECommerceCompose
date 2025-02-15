@@ -15,5 +15,7 @@ object CartContract {
         data class DeleteFromCart(val id: Int,val userId: String) : UiAction()
     }
 
-    sealed class UiEffect
+    sealed class UiEffect {
+        data object NavigateCheckout : UiEffect()
+    }
 }

@@ -40,6 +40,9 @@ sealed interface Screen {
     data object Discount : Screen
 
     @Serializable
+    data object Checkout: Screen
+
+    @Serializable
     data class Product(val categoryName: String) : Screen
 
     companion object {

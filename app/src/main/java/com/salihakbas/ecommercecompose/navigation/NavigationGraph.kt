@@ -16,6 +16,8 @@ import com.salihakbas.ecommercecompose.ui.cart.CartScreen
 import com.salihakbas.ecommercecompose.ui.cart.CartViewModel
 import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordScreen
 import com.salihakbas.ecommercecompose.ui.changepassword.ChangePasswordViewModel
+import com.salihakbas.ecommercecompose.ui.checkout.CheckoutScreen
+import com.salihakbas.ecommercecompose.ui.checkout.CheckoutViewModel
 import com.salihakbas.ecommercecompose.ui.detail.DetailScreen
 import com.salihakbas.ecommercecompose.ui.detail.DetailViewModel
 import com.salihakbas.ecommercecompose.ui.discount.DiscountScreen
@@ -45,7 +47,7 @@ fun NavigationGraph(
     startDestination: Screen,
     modifier: Modifier = Modifier,
 
-) {
+    ) {
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -145,8 +147,8 @@ fun NavigationGraph(
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
                 navController = navController,
-                onBackClick = {navController.popBackStack()},
-                navigateToSearch = {navController.navigate(Screen.Search)},
+                onBackClick = { navController.popBackStack() },
+                navigateToSearch = { navController.navigate(Screen.Search) },
                 userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             )
         }
@@ -159,12 +161,22 @@ fun NavigationGraph(
                 uiState = uiState,
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                navigateCheckout = { navController.navigate(Screen.Checkout) }
 
             )
             LaunchedEffect(Unit) {
                 viewModel.getCartProducts(userId)
             }
+        }
+        composable<Screen.Checkout> {
+            val viewModel: CheckoutViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val uiEffect = viewModel.uiEffect
+            CheckoutScreen(
+                uiState = uiState,
+                uiEffect = uiEffect,
+                onAction = viewModel::onAction)
         }
         composable<Screen.Favorites> {
             val viewModel: FavoritesViewModel = hiltViewModel()

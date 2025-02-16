@@ -1,9 +1,6 @@
 package com.salihakbas.ecommercecompose.ui.checkout
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -22,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -46,10 +44,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.salihakbas.ecommercecompose.data.model.Address
+import com.salihakbas.ecommercecompose.data.model.CreditCard
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiAction
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiState
@@ -70,7 +71,9 @@ fun CheckoutScreen(
             addresses = uiState.address,
             onAddAddress = { address -> onAction(UiAction.AddAddress(address)) },
             onAction = onAction,
-            uiState = uiState
+            uiState = uiState,
+            onAddCreditCard = { creditCard -> onAction(UiAction.AddCreditCard(creditCard)) },
+            creditCard = uiState.creditCards
         )
     }
 }
@@ -78,9 +81,11 @@ fun CheckoutScreen(
 @Composable
 fun CheckoutContent(
     addresses: List<Address>,
+    creditCard: List<CreditCard>,
     onAddAddress: (Address) -> Unit,
     onAction: (UiAction) -> Unit,
-    uiState: UiState
+    uiState: UiState,
+    onAddCreditCard: (CreditCard) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -93,7 +98,12 @@ fun CheckoutContent(
             onAction = onAction,
             uiState = uiState
         )
-        CreditCardCard()
+        CreditCardCard(
+            onAction = onAction,
+            uiState = uiState,
+            onAddCreditCard = onAddCreditCard,
+            creditCard = creditCard
+        )
     }
 }
 
@@ -110,8 +120,7 @@ fun AddressCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -218,6 +227,59 @@ fun AddressCardItem(address: Address) {
     }
 }
 
+@Composable
+fun CreditCardItem(creditCard: CreditCard) {
+    Card(
+        modifier = Modifier
+            .size(width = 320.dp, height = 180.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Text(
+                text = creditCard.cardName,
+                fontSize = 18.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = creditCard.cardOwnerName,
+                fontSize = 16.sp,
+                color = Color.White
+            )
+
+            Text(
+                text = "${creditCard.cardNumber.take(4)} **** **** ${creditCard.cardNumber.takeLast(4)}",
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = creditCard.expiryDate.padEnd(5,'/'),
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+                Text(
+                    text = "*${creditCard.cvv.takeLast(2)}",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -309,17 +371,14 @@ fun AddressBottomSheet(
 }
 
 @Composable
-fun CreditCardCard() {
+fun CreditCardCard(
+    onAction: (UiAction) -> Unit,
+    uiState: UiState,
+    onAddCreditCard: (CreditCard) -> Unit,
+    creditCard: List<CreditCard>
+) {
     var isExpanded by remember { mutableStateOf(false) }
-
-    val transition = updateTransition(targetState = isExpanded, label = "expandTransition")
-
-    val cardOffset by transition.animateDp(
-        transitionSpec = { tween(durationMillis = 500) },
-        label = "Card Offset"
-    ) { expanded ->
-        if (expanded) 0.dp else (-10).dp
-    }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -339,6 +398,13 @@ fun CreditCardCard() {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
+            IconButton(onClick = { showBottomSheet = true }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
             IconButton(onClick = { isExpanded = !isExpanded }) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
@@ -346,34 +412,151 @@ fun CreditCardCard() {
                 )
             }
         }
-
         AnimatedVisibility(
             visible = isExpanded,
             enter = slideInVertically(initialOffsetY = { -10 }) + fadeIn(),
             exit = slideOutVertically(targetOffsetY = { -10 }) + fadeOut()
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+            if (creditCard.isEmpty()) {
+                Text(
+                    text = "Kayıtlı kart bulunmamaktadır.",
+                    fontSize = 16.sp
+                )
+            } else {
+                LazyRow(
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Adres 1: İstanbul, Türkiye", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Adres 2: Ankara, Türkiye", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text("Adres Ekle")
+                    items(creditCard) { creditCard ->
+                        CreditCardItem(creditCard = creditCard)
                     }
                 }
+            }
+        }
+    }
+    if (showBottomSheet) {
+        CreditCardBottomSheet(
+            onDismiss = { showBottomSheet = false },
+            uiState = uiState,
+            onAction = onAction,
+            onAdd = { creditCard ->
+                onAddCreditCard(creditCard)
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CreditCardBottomSheet(
+    onDismiss: () -> Unit,
+    uiState: UiState,
+    onAction: (UiAction) -> Unit,
+    onAdd: (CreditCard) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Yeni Kart Ekle", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+            OutlinedTextField(
+                value = uiState.cardName,
+                onValueChange = { onAction(UiAction.OnCardNameChange(it.replaceFirstChar { char -> char.uppercase() })) },
+                label = { Text("Kart İsmi") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = uiState.cardOwnerName,
+                onValueChange = { onAction(UiAction.OnCardOwnerNameChange(it)) },
+                label = { Text("Ad Soyad") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Text
+                )
+            )
+            OutlinedTextField(
+                value = uiState.cardNumber,
+                onValueChange = { input ->
+                    val digitsOnly = input.filter { it.isDigit() }
+                    if (digitsOnly.length <= 16) {
+                        val formatted = digitsOnly.chunked(4).joinToString(" ")
+                        val cursorPosition = formatted.length
+                        onAction(UiAction.OnCardNumberChange(formatted))
+                        onAction(UiAction.UpdateCardNumberCursor(cursorPosition))
+                    }
+
+                },
+                label = { Text("Kart Numarası") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                OutlinedTextField(
+                    value = uiState.cardDate,
+                    onValueChange = {
+                      if (it.length <= 5) {
+                          val formatted = it.replace(Regex("[^0-9]"), "")
+                              .chunked(2)
+                              .joinToString("/")
+
+                          onAction(UiAction.OnCardDateChange(formatted))
+                      }
+                    },
+                    label = { Text("Son Kullanma Tarihi") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    )
+                )
+                OutlinedTextField(
+                    value = uiState.cardCvv,
+                    onValueChange = {
+                        if (it.length <= 3) {
+                            onAction(UiAction.OnCardCvvChange(it))
+                        }
+                    },
+                    label = { Text("CVV") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    )
+                )
+            }
+            Button(
+                onClick = {
+                    if (uiState.cardOwnerName.isNotBlank() && uiState.cardNumber.isNotBlank() && uiState.cardCvv.isNotBlank()) {
+                        onAdd(
+                            CreditCard(
+                                id = 0,
+                                cardName = uiState.cardName,
+                                cardNumber = uiState.cardNumber,
+                                expiryDate = uiState.cardDate,
+                                cvv = uiState.cardCvv,
+                                cardOwnerName = uiState.cardOwnerName,
+                            )
+                        )
+                        onDismiss()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ekle")
             }
         }
     }

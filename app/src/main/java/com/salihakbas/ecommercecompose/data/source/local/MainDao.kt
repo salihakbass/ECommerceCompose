@@ -1,6 +1,7 @@
 package com.salihakbas.ecommercecompose.data.source.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -33,5 +34,8 @@ interface MainDao {
 
     @Query("SELECT EXISTS (SELECT 1 FROM favorite_products WHERE id = :productId)")
     suspend fun isFavoriteProduct(productId: Int): Boolean
+
+    @Query("DELETE FROM favorite_products")
+    suspend fun removeAllFavoriteProducts()
 
 }

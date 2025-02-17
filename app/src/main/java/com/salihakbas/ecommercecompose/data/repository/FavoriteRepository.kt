@@ -39,4 +39,8 @@ class FavoriteRepository @Inject constructor(
     suspend fun getAllFavorites() : List<FavoriteProduct> {
         return dao.getAllFavoriteProducts()
     }
+
+    suspend fun deleteAllFavoriteProducts() {
+        dao.removeAllFavoriteProducts()
+    }
 }

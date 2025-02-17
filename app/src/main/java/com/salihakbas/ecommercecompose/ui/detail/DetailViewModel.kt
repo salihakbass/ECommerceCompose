@@ -1,10 +1,11 @@
 package com.salihakbas.ecommercecompose.ui.detail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.salihakbas.ecommercecompose.common.Resource
+import com.salihakbas.ecommercecompose.data.repository.FavoriteRepository
+import com.salihakbas.ecommercecompose.domain.model.toProduct
 import com.salihakbas.ecommercecompose.domain.usecase.AddToCartUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.GetProductDetailUseCase
 import com.salihakbas.ecommercecompose.domain.usecase.GetProductsByCategoryUseCase
@@ -27,7 +28,8 @@ class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getProductDetailUseCase: GetProductDetailUseCase,
     private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase,
-    private val addToCartUseCase: AddToCartUseCase
+    private val addToCartUseCase: AddToCartUseCase,
+    private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -39,11 +41,13 @@ class DetailViewModel @Inject constructor(
     init {
         val productId = savedStateHandle.get<Int>("productId") ?: 0
         getProductDetail(productId)
+        checkIsFavorite(productId)
     }
 
     fun onAction(uiAction: UiAction) {
         when (uiAction) {
             is UiAction.AddToCart -> addToCart(uiAction.userId, uiAction.productId)
+            is UiAction.ToggleFavorite -> toggleFavorite()
         }
     }
 
@@ -63,32 +67,47 @@ class DetailViewModel @Inject constructor(
     private fun getSimilarProducts(category: String) = viewModelScope.launch {
         val currentProductId = _uiState.value.product?.id
 
-        when(val resource = getProductsByCategoryUseCase(category)) {
+        when (val resource = getProductsByCategoryUseCase(category)) {
             is Resource.Success -> {
                 val filteredList = resource.data.filter { it.id != currentProductId }
                 updateUiState { copy(similarProducts = filteredList) }
             }
+
             is Resource.Error -> {
                 updateUiState { copy(error = resource.message) }
             }
         }
     }
 
-    private fun addToCart(userId: String,productId: Int) = viewModelScope.launch {
+    private fun addToCart(userId: String, productId: Int) = viewModelScope.launch {
         updateUiState { copy(isLoading = true) }
 
-        when(val resource = addToCartUseCase(userId, productId)) {
+        when (val resource = addToCartUseCase(userId, productId)) {
             is Resource.Success -> {
                 updateUiState { copy(isLoading = false) }
-                Log.d("Cart", "Product added to cart: ${resource.data}")
-                Log.d("Cart", "Product added to cart: $productId")
             }
 
             is Resource.Error -> {
                 updateUiState { copy(isLoading = false, error = resource.message) }
-
             }
         }
+    }
+
+    private fun checkIsFavorite(productId: Int) = viewModelScope.launch {
+        val isFavorite = favoriteRepository.isProductFavorite(productId)
+        updateUiState { copy(isFavorite = isFavorite) }
+    }
+
+    private fun toggleFavorite() = viewModelScope.launch {
+        val productDetail = _uiState.value.product ?: return@launch
+        val product = productDetail.toProduct()
+        if (_uiState.value.isFavorite) {
+            favoriteRepository.removeFavoriteProduct(product.id)
+        } else {
+            favoriteRepository.addFavoriteProduct(product)
+        }
+        checkIsFavorite(product.id)
+
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

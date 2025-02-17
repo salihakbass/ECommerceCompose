@@ -9,11 +9,14 @@ object DetailContract {
         val list: List<String> = emptyList(),
         val error: String = "",
         val product: ProductDetail? = null,
-        val similarProducts: List<Product> = emptyList()
+        val similarProducts: List<Product> = emptyList(),
+        val isFavorite: Boolean = false,
+        val favoriteProduct : Product? = null
     )
 
     sealed class UiAction {
         data class AddToCart(val userId: String, val productId: Int) : UiAction()
+        data object ToggleFavorite : UiAction()
     }
 
     sealed class UiEffect {

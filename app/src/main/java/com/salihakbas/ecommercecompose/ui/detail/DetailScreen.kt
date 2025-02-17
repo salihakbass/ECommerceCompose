@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -72,8 +73,6 @@ fun DetailScreen(
             UiEffect.NavigateSearch -> {
                 navigateToSearch()
             }
-
-
         }
     }
     Scaffold(
@@ -100,6 +99,7 @@ fun DetailScreen(
             uiState,
             Modifier.padding(paddingValues),
             navController,
+            onAction
         )
     }
 }
@@ -108,7 +108,8 @@ fun DetailScreen(
 fun DetailContent(
     uiState: UiState,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    onAction: (UiAction) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -137,11 +138,12 @@ fun DetailContent(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onAction(UiAction.ToggleFavorite) }) {
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
+                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(36.dp),
+                    tint = if (uiState.isFavorite) Color.Red else Color.Gray
                 )
             }
         }

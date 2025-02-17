@@ -33,11 +33,25 @@ class FavoritesViewModel @Inject constructor(
     }
 
     fun onAction(uiAction: UiAction) {
+        when(uiAction) {
+            is UiAction.RemoveFavorite -> deleteFavoriteProduct(uiAction.productId)
+            is UiAction.DeleteAllFavorites -> deleteAllFavoriteProducts()
+        }
     }
 
     private fun getFavoriteProducts() = viewModelScope.launch {
         val favoriteProducts = favoriteRepository.getAllFavorites()
         updateUiState { copy(favoriteProducts = favoriteProducts) }
+    }
+
+    private fun deleteFavoriteProduct(productId: Int) = viewModelScope.launch {
+        favoriteRepository.removeFavoriteProduct(productId)
+        getFavoriteProducts()
+    }
+
+    private fun deleteAllFavoriteProducts() = viewModelScope.launch {
+        favoriteRepository.deleteAllFavoriteProducts()
+        getFavoriteProducts()
     }
 
     private fun updateUiState(block: UiState.() -> UiState) {

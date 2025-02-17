@@ -9,7 +9,12 @@ object FavoritesContract {
         val favoriteProducts: List<FavoriteProduct> = emptyList(),
     )
 
-    sealed class UiAction
+    sealed class UiAction {
+        data class RemoveFavorite(val productId: Int) : UiAction()
+        data object DeleteAllFavorites : UiAction()
+    }
 
-    sealed class UiEffect
+    sealed class UiEffect {
+        data class ProductClick(val id: Int) : UiEffect()
+    }
 }

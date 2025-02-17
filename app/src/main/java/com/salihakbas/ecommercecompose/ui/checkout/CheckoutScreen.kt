@@ -5,9 +5,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -54,8 +57,6 @@ import com.salihakbas.ecommercecompose.data.model.CreditCard
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiAction
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiEffect
 import com.salihakbas.ecommercecompose.ui.checkout.CheckoutContract.UiState
-import com.salihakbas.ecommercecompose.ui.components.EmptyScreen
-import com.salihakbas.ecommercecompose.ui.components.LoadingBar
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -64,17 +65,32 @@ fun CheckoutScreen(
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit
 ) {
-    when {
-        uiState.isLoading -> LoadingBar()
-        uiState.list.isNotEmpty() -> EmptyScreen()
-        else -> CheckoutContent(
-            addresses = uiState.address,
-            onAddAddress = { address -> onAction(UiAction.AddAddress(address)) },
-            onAction = onAction,
-            uiState = uiState,
-            onAddCreditCard = { creditCard -> onAction(UiAction.AddCreditCard(creditCard)) },
-            creditCard = uiState.creditCards
-        )
+    var selectedAddressId by remember { mutableStateOf<Long?>(null) }
+    var selectedCreditCardId by remember { mutableStateOf<Long?>(null) }
+
+    Scaffold(
+        bottomBar = {
+            BottomBarCheckout()
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            CheckoutContent(
+                addresses = uiState.address,
+                selectedAddressId = selectedAddressId,
+                onSelectAddress = { selectedAddressId = it },
+                onAddAddress = { address -> onAction(UiAction.AddAddress(address)) },
+                onAction = onAction,
+                uiState = uiState,
+                selectedCreditCardId = selectedCreditCardId,
+                onSelectCard = { selectedCreditCardId = it },
+                onAddCreditCard = { creditCard -> onAction(UiAction.AddCreditCard(creditCard)) },
+                creditCard = uiState.creditCards
+            )
+        }
     }
 }
 
@@ -82,6 +98,10 @@ fun CheckoutScreen(
 fun CheckoutContent(
     addresses: List<Address>,
     creditCard: List<CreditCard>,
+    selectedAddressId: Long?,
+    selectedCreditCardId: Long?,
+    onSelectAddress: (Long) -> Unit,
+    onSelectCard: (Long) -> Unit,
     onAddAddress: (Address) -> Unit,
     onAction: (UiAction) -> Unit,
     uiState: UiState,
@@ -94,12 +114,16 @@ fun CheckoutContent(
     ) {
         AddressCard(
             addresses = addresses,
+            selectedAddressId = selectedAddressId,
+            onSelectAddress = onSelectAddress,
             onAddAddress = onAddAddress,
             onAction = onAction,
             uiState = uiState
         )
         CreditCardCard(
             onAction = onAction,
+            selectedCreditCardId = selectedCreditCardId,
+            onSelectCard = onSelectCard,
             uiState = uiState,
             onAddCreditCard = onAddCreditCard,
             creditCard = creditCard
@@ -110,6 +134,8 @@ fun CheckoutContent(
 @Composable
 fun AddressCard(
     addresses: List<Address>,
+    selectedAddressId: Long?,
+    onSelectAddress: (Long) -> Unit,
     onAddAddress: (Address) -> Unit,
     onAction: (UiAction) -> Unit,
     uiState: UiState
@@ -163,7 +189,11 @@ fun AddressCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(addresses) { address ->
-                            AddressCardItem(address = address)
+                            AddressCardItem(
+                                address = address,
+                                isSelected = address.id.toLong() == selectedAddressId,
+                                onSelect = { onSelectAddress(address.id.toLong()) }
+                            )
                         }
                     }
                 }
@@ -184,13 +214,18 @@ fun AddressCard(
 }
 
 @Composable
-fun AddressCardItem(address: Address) {
+fun AddressCardItem(address: Address, isSelected: Boolean, onSelect: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(width = 180.dp, height = 180.dp),
+            .size(width = 180.dp, height = 180.dp)
+            .border(
+                width = if (isSelected) 3.dp else 1.dp,
+                color = if (isSelected) Color.Blue else Color.Gray,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable { onSelect() },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(width = 1.dp, color = Color.Gray)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -228,10 +263,16 @@ fun AddressCardItem(address: Address) {
 }
 
 @Composable
-fun CreditCardItem(creditCard: CreditCard) {
+fun CreditCardItem(creditCard: CreditCard, isSelected: Boolean, onSelect: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(width = 320.dp, height = 180.dp),
+            .size(width = 320.dp, height = 180.dp)
+            .border(
+                width = if (isSelected) 3.dp else 1.dp,
+                color = if (isSelected) Color.Yellow else Color.Transparent,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable { onSelect() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
         elevation = CardDefaults.cardElevation(8.dp)
@@ -256,7 +297,11 @@ fun CreditCardItem(creditCard: CreditCard) {
             )
 
             Text(
-                text = "${creditCard.cardNumber.take(4)} **** **** ${creditCard.cardNumber.takeLast(4)}",
+                text = "${creditCard.cardNumber.take(4)} **** **** ${
+                    creditCard.cardNumber.takeLast(
+                        4
+                    )
+                }",
                 fontSize = 20.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold
@@ -266,7 +311,7 @@ fun CreditCardItem(creditCard: CreditCard) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = creditCard.expiryDate.padEnd(5,'/'),
+                    text = creditCard.expiryDate.padEnd(5, '/'),
                     fontSize = 16.sp,
                     color = Color.White
                 )
@@ -374,6 +419,8 @@ fun AddressBottomSheet(
 fun CreditCardCard(
     onAction: (UiAction) -> Unit,
     uiState: UiState,
+    selectedCreditCardId: Long?,
+    onSelectCard: (Long) -> Unit,
     onAddCreditCard: (CreditCard) -> Unit,
     creditCard: List<CreditCard>
 ) {
@@ -428,8 +475,12 @@ fun CreditCardCard(
                         .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(creditCard) { creditCard ->
-                        CreditCardItem(creditCard = creditCard)
+                    items(creditCard) { card ->
+                        CreditCardItem(
+                            creditCard = card,
+                            isSelected = card.id.toLong() == selectedCreditCardId,
+                            onSelect = { onSelectCard(card.id.toLong()) }
+                        )
                     }
                 }
             }
@@ -487,9 +538,7 @@ fun CreditCardBottomSheet(
                     val digitsOnly = input.filter { it.isDigit() }
                     if (digitsOnly.length <= 16) {
                         val formatted = digitsOnly.chunked(4).joinToString(" ")
-                        val cursorPosition = formatted.length
                         onAction(UiAction.OnCardNumberChange(formatted))
-                        onAction(UiAction.UpdateCardNumberCursor(cursorPosition))
                     }
 
                 },
@@ -508,13 +557,13 @@ fun CreditCardBottomSheet(
                 OutlinedTextField(
                     value = uiState.cardDate,
                     onValueChange = {
-                      if (it.length <= 5) {
-                          val formatted = it.replace(Regex("[^0-9]"), "")
-                              .chunked(2)
-                              .joinToString("/")
+                        if (it.length <= 5) {
+                            val formatted = it.replace(Regex("[^0-9]"), "")
+                                .chunked(2)
+                                .joinToString("/")
 
-                          onAction(UiAction.OnCardDateChange(formatted))
-                      }
+                            onAction(UiAction.OnCardDateChange(formatted))
+                        }
                     },
                     label = { Text("Son Kullanma Tarihi") },
                     modifier = Modifier.weight(1f),
@@ -558,6 +607,33 @@ fun CreditCardBottomSheet(
             ) {
                 Text("Ekle")
             }
+        }
+    }
+}
+
+@Composable
+fun BottomBarCheckout() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonColors(
+                containerColor = Color.Black,
+                contentColor = Color.White,
+                disabledContainerColor = Color.Gray,
+                disabledContentColor = Color.DarkGray
+            )
+        ) {
+            Text(
+                text = "Ödemeyi Gerçekleştir",
+                fontSize = 20.sp
+            )
         }
     }
 }

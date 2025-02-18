@@ -25,17 +25,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyappTheme {
                 val navController = rememberNavController()
-                val startDestination = Screen.Home
+                val startDestination = Screen.Splash
 
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = currentBackStackEntry?.destination?.route
 
-                val bottomNavScreens = listOf(
-                    Screen.Home,
-                    Screen.Cart,
-                    Screen.Favorites,
-                    Screen.Profile
-                )
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {

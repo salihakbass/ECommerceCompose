@@ -35,8 +35,8 @@ class HomeViewModel @Inject constructor(
     val uiEffect: Flow<UiEffect> by lazy { _uiEffect.receiveAsFlow() }
 
     init {
-        getCategories()
-        fetchProducts()
+        getCategories() // ***Loading durumları kontrol et ***
+        fetchProducts() // State durumunu kontrol et
     }
 
     fun onAction(uiAction: UiAction) {
@@ -52,16 +52,6 @@ class HomeViewModel @Inject constructor(
                     is Resource.Error -> updateUiState { copy(errorMessage = result.message) }
                 }
             }
-    }
-
-    fun filterProductsByCategory(categoryName: String?) {
-        val allProducts = uiState.value.allProducts
-        val filteredProducts = if (categoryName == null || categoryName == "Tümü") {
-            allProducts
-        } else {
-            allProducts.filter { it.category.equals(categoryName, ignoreCase = true) }
-        }
-        updateUiState { copy(productList = filteredProducts) }
     }
 
     private fun fetchProducts() = viewModelScope.launch {

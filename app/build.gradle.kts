@@ -98,11 +98,13 @@ dependencies {
     implementation(libs.coil.compose)
 
     // Detekt
-    detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.detekt)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation (libs.firebase.database.ktx)
+
+    implementation (libs.accompanist.pager)
 }
 
 detekt {

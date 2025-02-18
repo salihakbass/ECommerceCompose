@@ -5,6 +5,25 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary colors -->
+    <color name="primary">#6200EE</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="primary_light">#BB86FC</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary">#03DAC6</color>
+    <color name="secondary_dark">#018786</color>
+
+    <!-- Neutral colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#9E9E9E</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="dark_gray">#616161</color>
+    <color name="green">#48d861</color>
+
+    <!-- Accent colors -->
+    <color name="error">#B00020</color>
+    <color name="success">#388E3C</color>
+    <color name="warning">#FFA000</color>
 </resources>

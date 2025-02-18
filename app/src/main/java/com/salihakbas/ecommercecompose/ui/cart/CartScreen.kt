@@ -64,11 +64,13 @@ fun CartScreen(
     uiEffect: Flow<UiEffect>,
     onAction: (UiAction) -> Unit,
     onBackClick: () -> Unit,
-    navigateCheckout: () -> Unit
+    navigateCheckout: () -> Unit,
+    navigateToDetail: (Int) -> Unit
 ) {
     uiEffect.collectWithLifecycle { effect ->
-        when(effect) {
+        when (effect) {
             is UiEffect.NavigateCheckout -> navigateCheckout()
+            is UiEffect.ProductClick -> navigateToDetail(effect.id)
         }
     }
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -97,7 +99,8 @@ fun CartScreen(
             CartContent(
                 uiState,
                 onAction,
-                userId
+                userId,
+                navigateToDetail
             )
         }
     }
@@ -107,7 +110,8 @@ fun CartScreen(
 fun CartContent(
     uiState: UiState,
     onAction: (UiAction) -> Unit,
-    userId: String
+    userId: String,
+    navigateToDetail: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -123,7 +127,8 @@ fun CartContent(
                     product = product,
                     onAction = onAction,
                     userId = userId,
-                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                    navigateToDetail = navigateToDetail
                 )
             }
         }
@@ -135,7 +140,8 @@ fun CartCard(
     product: Product,
     onAction: (UiAction) -> Unit,
     userId: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Int) -> Unit
 ) {
     var isVisible by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
@@ -158,7 +164,11 @@ fun CartCard(
                     model = ImageRequest.Builder(LocalContext.current).data(product.imageOne)
                         .build(),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clickable {
+                            navigateToDetail(product.id)
+                        }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(
@@ -388,6 +398,7 @@ fun CartScreenPreview(
         uiEffect = emptyFlow(),
         onAction = {},
         onBackClick = {},
-        navigateCheckout = {}
+        navigateCheckout = {},
+        navigateToDetail = {}
     )
 }

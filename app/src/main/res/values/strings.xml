@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">ECommerceCompose</string>
-    <string name="welcome_back_detail_text">Tekrar Hoşgeldin. Lütfen kullanıcı bilgilerini gir.</string>
+    <string name="welcome_back_detail_text">Lütfen kullanıcı bilgilerini gir.</string>
     <string name="email_text">Email</string>
     <string name="password_text">Şifre</string>
     <string name="remember_me_text">Beni Hatırla</string>
@@ -18,9 +18,7 @@
     <string name="name_text">Ad</string>
     <string name="surname_text">Soyad</string>
     <string name="sign_up_toast_text">Lütfen tüm alanları doldurun veya şifre gereksinimlerini sağlayın.</string>
-    <string name="password_must_six_text">Şifre en az 6 karakter olmalıdır.</string>
-    <string name="password_must_has_letter_text">Şifre en az bir harf içermelidir.</string>
-    <string name="password_must_has_number_text">Şifre en az bir rakam içermelidir.</string>
+    <string name="password_must_six_text">Şifre en az 6 karakter uzunluğunda olmalı, en az bir harf ve bir rakam içermelidir.</string>
     <string name="password_must_match_text">Şifreler aynı olmalıdır.</string>
     <string name="email_or_password_incorrect_text">E-mail veya şifre yanlış. Lütfen tekrar deneyin.</string>
     <string name="password_changed_text">Şifre başarıyla değiştirildi</string>

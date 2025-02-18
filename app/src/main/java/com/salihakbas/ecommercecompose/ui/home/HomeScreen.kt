@@ -101,7 +101,7 @@ fun HomeContent(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = stringResource(R.string.welcome_text, uiState.userName),
+            text = "Hoşgeldin, ${uiState.userName}",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier

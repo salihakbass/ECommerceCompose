@@ -59,9 +59,7 @@ class SignUpViewModel @Inject constructor(
         val containsDigit = password.any { it.isDigit() }
         updateUiState {
             copy(
-                isPasswordLongEnough = password.length >= 6,
-                hasLetter = containsLetter,
-                hasNumber = containsDigit,
+                isPasswordLongEnough = password.length >= 6 && containsLetter && containsDigit,
                 isPasswordMatching = password == confirmPassword
             )
         }
@@ -107,10 +105,8 @@ class SignUpViewModel @Inject constructor(
 
         database.child("users").child(userId).setValue(userMap)
             .addOnSuccessListener {
-                Log.d("RealtimeDatabase", "Kullanıcı başarıyla kaydedildi.")
             }
             .addOnFailureListener { e ->
-                Log.e("RealtimeDatabase", "Hata oluştu: ${e.message}")
             }
     }
 

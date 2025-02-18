@@ -132,6 +132,9 @@ fun NavigationGraph(
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
             )
+            LaunchedEffect(key1 = userId) {
+                viewModel.fetchUserFromRealtimeDatabase(userId)
+            }
         }
         composable(
             route = "${Screen.getRoute(Screen.Detail(0))}/{productId}",
@@ -162,8 +165,10 @@ fun NavigationGraph(
                 uiEffect = uiEffect,
                 onAction = viewModel::onAction,
                 onBackClick = { navController.popBackStack() },
-                navigateCheckout = { navController.navigate(Screen.Checkout) }
-
+                navigateCheckout = { navController.navigate(Screen.Checkout) },
+                navigateToDetail = { productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
             LaunchedEffect(Unit) {
                 viewModel.getCartProducts(userId)
@@ -176,7 +181,8 @@ fun NavigationGraph(
             CheckoutScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction)
+                onAction = viewModel::onAction
+            )
         }
         composable<Screen.Favorites> {
             val viewModel: FavoritesViewModel = hiltViewModel()
@@ -185,7 +191,10 @@ fun NavigationGraph(
             FavoritesScreen(
                 uiState = uiState,
                 uiEffect = uiEffect,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
+                navigateToDetail = { productId ->
+                    navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
+                }
             )
         }
         composable<Screen.Profile> {
@@ -247,9 +256,6 @@ fun NavigationGraph(
                     navController.navigate("${Screen.getRoute(Screen.Detail(0))}/$productId")
                 }
             )
-
         }
-
-
     }
 }

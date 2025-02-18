@@ -47,13 +47,17 @@ fun ChangePasswordScreen(
     uiEffect.collectWithLifecycle { effect ->
         when (effect) {
             is UiEffect.ShowToast -> {
-                Toast.makeText(context,
-                    context.getString(R.string.password_changed_text), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.password_changed_text), Toast.LENGTH_SHORT
+                ).show()
             }
 
             is UiEffect.ShowErrorToast -> {
-                Toast.makeText(context,
-                    context.getString(R.string.password_error_text), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.password_error_text), Toast.LENGTH_SHORT
+                ).show()
             }
 
             is UiEffect.NavigateToProfile -> {
@@ -141,13 +145,11 @@ fun ChangePasswordContent(uiState: UiState, onAction: (UiAction) -> Unit) {
 
         PasswordRequirements(
             isPasswordLongEnough = uiState.isPasswordLongEnough,
-            hasLetter = uiState.hasLetter,
-            hasPassword = uiState.hasNumber,
             isPasswordMatching = uiState.isPasswordMatching
         )
 
         Button(
-            onClick = {onAction(UiAction.ChangePassword)},
+            onClick = { onAction(UiAction.ChangePassword) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),

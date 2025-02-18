@@ -11,8 +11,6 @@ object SignUpContract {
         val errorState: ErrorState? = null,
         val isCheckboxChecked: Boolean = false,
         val isPasswordLongEnough: Boolean = false,
-        val hasNumber: Boolean = false,
-        val hasLetter: Boolean = false,
         val isPasswordMatching: Boolean = false,
         val list: List<String> = emptyList(),
     ) {
@@ -29,7 +27,7 @@ object SignUpContract {
             )
         }
         fun isSignUpValid(): Boolean {
-            return isPasswordLongEnough && hasNumber && hasLetter && isPasswordMatching &&
+            return isPasswordLongEnough  && isPasswordMatching &&
                     email.isNotEmpty() && name.isNotEmpty() && surname.isNotEmpty() && isCheckboxChecked
         }
     }
@@ -40,7 +38,6 @@ object SignUpContract {
         val confirmPasswordError: Boolean = false,
         val nameError: Boolean = false,
         val surnameError: Boolean = false,
-
     ) {
         fun hasError(): Boolean {
             return emailError || passwordError || confirmPasswordError || nameError || surnameError

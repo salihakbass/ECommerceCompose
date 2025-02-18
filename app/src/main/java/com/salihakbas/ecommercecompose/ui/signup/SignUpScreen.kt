@@ -195,8 +195,6 @@ fun SignUpContent(uiState: UiState, onAction: (UiAction) -> Unit) {
         )
         PasswordRequirements(
             isPasswordLongEnough = uiState.isPasswordLongEnough,
-            hasLetter = uiState.hasLetter,
-            hasPassword = uiState.hasNumber,
             isPasswordMatching = uiState.isPasswordMatching
         )
 

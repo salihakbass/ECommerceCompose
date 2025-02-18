@@ -17,8 +17,6 @@ import com.salihakbas.ecommercecompose.R
 @Composable
 fun PasswordRequirements(
     isPasswordLongEnough: Boolean,
-    hasLetter: Boolean,
-    hasPassword: Boolean,
     isPasswordMatching: Boolean
 ) {
     Column(
@@ -30,14 +28,6 @@ fun PasswordRequirements(
         PasswordRequirement(
             text = stringResource(R.string.password_must_six_text),
             isCorrect = isPasswordLongEnough
-        )
-        PasswordRequirement(
-            text = stringResource(R.string.password_must_has_letter_text),
-            isCorrect = hasLetter
-        )
-        PasswordRequirement(
-            text = stringResource(R.string.password_must_has_number_text),
-            isCorrect = hasPassword
         )
         PasswordRequirement(
             text = stringResource(R.string.password_must_match_text),

@@ -27,10 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.salihakbas.ecommercecompose.R
 
@@ -97,30 +93,4 @@ fun GoogleButton(
             }
         }
     }
-}
-
-@Composable
-fun AnnotatedLoginAndRegisterString(
-    accountText: String,
-    loginOrRegisterText: String
-) {
-    Text(
-        text = buildAnnotatedString {
-            withStyle(
-                style = SpanStyle(
-                    color = Color.Gray,
-                )
-            ) {
-                append(accountText)
-            }
-            withStyle(
-                style = SpanStyle(
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold
-                )
-            ) {
-                append(loginOrRegisterText)
-            }
-        }
-    )
 }

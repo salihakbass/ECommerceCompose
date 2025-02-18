@@ -30,12 +30,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -68,8 +65,10 @@ fun SignInScreen(
             is UiEffect.NavigateToHome -> navigateToHome()
             is UiEffect.NavigateToForgotPassword -> navigateToForgotPassword()
             is UiEffect.ShowToast ->
-                Toast.makeText(context,
-                    context.getString(R.string.email_or_password_incorrect_text), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.email_or_password_incorrect_text), Toast.LENGTH_SHORT
+                ).show()
         }
     }
 
@@ -90,7 +89,7 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome Back, Olivia",
+            text = "Tekrar Hoşgeldin",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
@@ -144,7 +143,7 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
         ) {
             Checkbox(
                 checked = uiState.isCheckboxChecked,
-                onCheckedChange = {onAction(UiAction.OnCheckboxToggle(it))}
+                onCheckedChange = { onAction(UiAction.OnCheckboxToggle(it)) }
             )
             Text(
                 text = stringResource(R.string.remember_me_text),
@@ -162,7 +161,7 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
             )
         }
         Button(
-            onClick = {onAction(UiAction.SignInClicked)},
+            onClick = { onAction(UiAction.SignInClicked) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
@@ -181,7 +180,7 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
         }
 
         Text(
-            text = "or",
+            text = "ya da",
             modifier = Modifier.padding(vertical = 12.dp),
             color = Color.Gray
         )
@@ -195,12 +194,11 @@ fun SignInContent(uiState: UiState, onAction: (UiAction) -> Unit, uiEffect: Flow
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-       AuthAnnotatedText(
-           normalText = stringResource(R.string.dont_have_an_account_text),
-           clickableText = stringResource(R.string.sign_up_text),
-           onClickableTextClick = { onAction(UiAction.SignUpClicked) }
-       )
-
+        AuthAnnotatedText(
+            normalText = stringResource(R.string.dont_have_an_account_text),
+            clickableText = stringResource(R.string.sign_up_text),
+            onClickableTextClick = { onAction(UiAction.SignUpClicked) }
+        )
 
 
     }

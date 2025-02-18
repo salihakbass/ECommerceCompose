@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "664680871467",
+    "project_id": "ecommercecompose-8bcd9",
+    "storage_bucket": "ecommercecompose-8bcd9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664680871467:android:aeb66d10b947c2bc3e1c6e",
+        "android_client_info": {
+          "package_name": "com.salihakbas.ecommercecompose"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiLLPmhORf_1DrqwzPVaQ7BbVfKA06vp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

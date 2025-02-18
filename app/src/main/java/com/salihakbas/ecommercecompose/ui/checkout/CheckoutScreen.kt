@@ -233,13 +233,6 @@ fun AddressCardItem(address: Address, isSelected: Boolean, onSelect: () -> Unit)
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.End)
-                )
-            }
             Text(
                 text = address.title,
                 fontSize = 18.sp
